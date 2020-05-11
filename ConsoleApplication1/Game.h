@@ -3,11 +3,9 @@
 	#define Game_Manager
 
 #include <string>
-#include <SFML\System\Vector2.hpp>
 #include <vector>
-#include <SFML\Graphics\Sprite.hpp>
-
-
+#include <SFML\System\Vector2.hpp>
+#include <SFML\Graphics.hpp>
 /*
 *******************************************
 *********** Equipaggiamento ***************
@@ -113,10 +111,16 @@ public:
 	Entità.
 */
 
-class Entita{
+class EntitaAbstract{
+	virtual void Movimento()  const= 0;
+	virtual void Attacco() const  = 0;
+};
+
+class Entita : public EntitaAbstract{
 public:
-	void Movimento();
-	void Attacco();
+	virtual void Movimento();
+	virtual void Attacco();
+
 	std::string GetNome() {
 		return this->nome;
 	}
@@ -241,13 +245,13 @@ public:
 		this->exp = newexp;
 
 	}
-	Giocatore(std::string nome, int forza, int vitalita, int stamina, int livello, float velocita, sf::Vector2f pos, float exp) :Entita(nome,forza,vitalita,livello,velocita,pos){
+	Giocatore(std::string const& nome, int forza, int  vitalita, int stamina, int livello, float velocita, sf::Vector2f pos, float exp) :Entita(nome,forza,vitalita,livello,velocita,pos){
 		this->SetStamina(stamina);
 		inventario = Inventario();
 		skills = std::vector<Skill>();
 		this->SetExp(exp);
 	}
-	Giocatore(std::string nome, sf::Vector2f pos) : Giocatore(nome, 100, 100, 100, 1, 0.2, pos,0) {}
+	Giocatore(std::string const& nome, sf::Vector2f pos) : Giocatore(nome, 100, 100, 100, 1, 0.2, pos,0) {}
 };
 
 /*
