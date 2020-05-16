@@ -54,7 +54,10 @@ public:
         return message.c_str();
     }
 };
-
+class ErrorManager {
+private:
+public:
+};
 
 
 #endif // !1

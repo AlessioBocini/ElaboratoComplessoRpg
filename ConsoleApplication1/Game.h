@@ -178,8 +178,8 @@ private:
 
 class Entita : public EntitaAbstract{
 public:
-	void Movimento();
-	void Attacco();
+	void Movimento() override;
+	void Attacco() override;
 	Entita(std::string nome, sf::Vector2f pos) :Entita(nome, 100, 100, 1, 0.7, pos) {}
 	Entita(std::string nome, int forza, int vitalita, int livello, float velocita, sf::Vector2f pos) : EntitaAbstract( nome,  forza, vitalita,livello,velocita, pos){}
 };
