@@ -2,6 +2,7 @@
 #include "Animator.h"
 #include "AssetManager.h"
 #include <iostream>
+#include "CustomException.h"
 
 Animator::Animator(sf::Sprite& sprite) :m_sprite(sprite), m_currenttime(), m_currentAnimation(nullptr) {}
 Animator::Animation& Animator::CreateAnimation(std::string const& name, std::string const& texturename, sf::Time const& duration, bool loop) {
@@ -13,13 +14,17 @@ Animator::Animation& Animator::CreateAnimation(std::string const& name, std::str
 }
 void Animator::SwitchAnimation(Animator::Animation* animation) {
     
-    sf::Texture& texture = AssetManager::GetTexture(animation->m_TextureName);
-
-    if (animation != nullptr)
-        this->m_sprite.setTexture(texture);
-
+    
+    try {
+      sf::Texture& texture = AssetManager::GetTexture(animation->m_TextureName);
+      if (animation != nullptr)
+        this->m_sprite.setTexture(texture); 
     m_currentAnimation = animation;
     m_currenttime = sf::Time::Zero;//resetta il tempo
+    }
+    catch (TextureException e) {
+        std::cout << e.what() << std::endl;
+    }
 }
 bool Animator::SwitchAnimation(std::string const& name) {
     auto animation = FindAnimation(name);

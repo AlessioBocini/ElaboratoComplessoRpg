@@ -112,15 +112,9 @@ public:
 */
 
 class EntitaAbstract{
-	virtual void Movimento()  const= 0;
-	virtual void Attacco() const  = 0;
-};
-
-class Entita : public EntitaAbstract{
 public:
-	virtual void Movimento();
-	virtual void Attacco();
-
+	virtual void Movimento()  = 0;
+	virtual void Attacco()   = 0;
 	std::string GetNome() {
 		return this->nome;
 	}
@@ -163,9 +157,7 @@ public:
 	void SetSprite(sf::Sprite sprite) {
 		this->sprite = sprite;
 	}
-
-	Entita(std::string nome, sf::Vector2f pos) :Entita(nome, 100, 100, 1, 0.7, pos) {}
-	Entita(std::string nome, int forza, int vitalita, int livello, float velocita, sf::Vector2f pos) {
+	EntitaAbstract(std::string nome, int forza, int vitalita, int livello, float velocita, sf::Vector2f pos) {
 		this->SetVitalita(vitalita);
 		this->SetForza(forza);
 		this->SetLivello(livello);
@@ -182,6 +174,14 @@ private:
 	int livello;
 	sf::Vector2f position;
 	sf::Sprite sprite;
+};
+
+class Entita : public EntitaAbstract{
+public:
+	void Movimento();
+	void Attacco();
+	Entita(std::string nome, sf::Vector2f pos) :Entita(nome, 100, 100, 1, 0.7, pos) {}
+	Entita(std::string nome, int forza, int vitalita, int livello, float velocita, sf::Vector2f pos) : EntitaAbstract( nome,  forza, vitalita,livello,velocita, pos){}
 };
 
 /*
@@ -206,7 +206,7 @@ public:
 	std::string GetTitolo() {
 		return this->titolo;
 	}
-	std::string setTitolo(std::string const& titolo){
+	bool setTitolo(std::string const& titolo){
 		this->titolo = titolo;
 	}
 };
@@ -251,7 +251,7 @@ public:
 		skills = std::vector<Skill>();
 		this->SetExp(exp);
 	}
-	Giocatore(std::string const& nome, sf::Vector2f pos) : Giocatore(nome, 100, 100, 100, 1, 0.2, pos,0) {}
+	Giocatore(std::string const& nome, sf::Vector2f pos) : Giocatore(nome, 100, 100, 100, 1, 0.05, pos,0) {}
 };
 
 /*

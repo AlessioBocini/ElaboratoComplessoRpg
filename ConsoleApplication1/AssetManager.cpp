@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "AssetManager.h"
+#include "CustomException.h"
 
 AssetManager* AssetManager::sInstance = nullptr;
 
@@ -19,7 +20,13 @@ sf::Texture& AssetManager::GetTexture(std::string const& filename) {
 	}
 	else {
 		auto& texture = textMap[filename];
-		texture.loadFromFile(filename);
+
+		try {
+			texture.loadFromFile(filename);
+		}
+		catch (std::exception e) {
+			throw TextureException("The texture has failed to load");
+		}
 		return texture;
 	}
 }
@@ -32,7 +39,13 @@ sf::SoundBuffer& AssetManager::GetSoundBuffer(std::string const& filename) {
 	}
 	else {
 		auto& sBuffer = sBufferMap[filename];
-		sBuffer.loadFromFile(filename);
+		try {
+			sBuffer.loadFromFile(filename);
+		}
+		catch (std::exception e) {
+			throw SoundBufferException("The SoundBuffer has failed to load");
+		}
+		
 		return sBuffer;
 	}
 }
@@ -45,7 +58,13 @@ sf::Font& AssetManager::GetFont(std::string const& filename) {
 	}
 	else {
 		auto& sFont = fontMap[filename];
-		sFont.loadFromFile(filename);
+		try {
+			sFont.loadFromFile(filename);
+		}
+		catch (std::exception e) {
+			throw FontException("Font not found");
+		}
+		
 		return sFont;
 	}
 }
