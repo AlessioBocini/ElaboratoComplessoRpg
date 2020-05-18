@@ -5,6 +5,7 @@
 #include "CustomException.h"
 
 Animator::Animator(sf::Sprite& sprite) :m_sprite(sprite), m_currenttime(), m_currentAnimation(nullptr) {}
+
 Animator::Animation& Animator::CreateAnimation(std::string const& name, std::string const& texturename, sf::Time const& duration, bool loop) {
     m_animations.push_back(Animator::Animation(name, texturename, duration, loop));
     if (m_currentAnimation == nullptr)

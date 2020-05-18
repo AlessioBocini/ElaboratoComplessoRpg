@@ -6,6 +6,8 @@
 #include <vector>
 #include <SFML\System\Vector2.hpp>
 #include <SFML\Graphics.hpp>
+#include "AssetManager.h"
+#include "Animator.h"
 /*
 *******************************************
 *********** Equipaggiamento ***************
@@ -84,22 +86,6 @@ public:
 	}
 };
 
-/*
-*********************************
-****** Manager ******************
-*********************************
-*/
-class GameManager {
-
-public:
-	bool isButtonPressedSKill(std::string const& buttonPressed);
-	bool AggiungiSkill(Skill skill);
-	bool isGameOver();
-	bool LoadGame();
-	bool SaveGame();
-	bool CheckForLevelUp();
-	void RegenStamina();
-};
 
 /*
 *************************************************
@@ -228,6 +214,7 @@ private:
 	float exp;
 public:
 	void Attacco(std::string const& buttonPressed, bool isSkill);
+	
 	bool Movimento(char const& buttonPressed);
 	bool EquipWeapon(Arma const& obj);
 	bool EquipArmor(Armatura const& obj);
@@ -251,7 +238,79 @@ public:
 		skills = std::vector<Skill>();
 		this->SetExp(exp);
 	}
-	Giocatore(std::string const& nome, sf::Vector2f pos) : Giocatore(nome, 100, 100, 100, 1, 0.05, pos,0) {}
+	Giocatore(std::string const& nome, sf::Vector2f pos) : Giocatore(nome, 100, 100, 100, 1, 1, pos,0) {}
+};
+
+
+
+/*
+*********************************
+****** Manager ******************
+*********************************
+*/
+
+class Window {
+public:
+	Window();
+	~Window();
+	Window(const std::string title, const sf::Vector2u& size, bool fullscreen);
+	void BeginDraw();
+	void EndDraw();
+
+	void Update();
+
+	bool isDone();
+	bool isFullscreen();
+
+	sf::Vector2u GetwindowSize();
+	void ToggleFullscreen();
+	void Draw(sf::Drawable& drawable);
+private:
+	bool isfullscreen;
+	bool isdone;
+	std::string windowTitle;
+	sf::RenderWindow window;
+	sf::Vector2u windowSize;
+	void Create();
+	void Destroy();
+	void Setup(const std::string title, const sf::Vector2u& size, bool fullscreen);
+};
+
+
+class GameManager {
+private:
+
+public:
+	Animator animpg;
+	sf::Vector2i spriteSize;
+	GameManager();
+	~GameManager();
+
+
+	void HandleInput();
+	void Update();
+	void Render();
+	Window* getWindow();
+	sf::Time GetElapsed();
+	void RestartClock();
+
+
+	bool isButtonPressedSKill(std::string const& buttonPressed);
+	bool AggiungiSkill(Skill skill);
+	bool isGameOver();
+	bool LoadGame();
+	bool SaveGame();
+	bool CheckForLevelUp();
+	void RegenStamina();
+private:
+	Window m_window;
+	
+	Giocatore player;
+	AssetManager assetmanager;
+	
+	sf::Clock clock;
+	sf::Time elapsed;
+	
 };
 
 /*
@@ -260,7 +319,7 @@ public:
 ******************************
 */
 class Territorio {
-	
+
 public:
 	bool ShowMap();
 };
@@ -279,7 +338,5 @@ public:
 		return this->nTerritori;
 	}
 };
-
-
 #endif
 

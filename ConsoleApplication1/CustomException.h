@@ -56,7 +56,7 @@ public:
 };
 class ErrorManager {
 private:
-public:
+public: 
 };
 
 
