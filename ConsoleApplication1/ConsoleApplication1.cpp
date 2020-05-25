@@ -19,8 +19,9 @@ int main() {
     animationD.AddFrames(sf::Vector2i(0, gamemanager.spriteSize.y * 2), gamemanager.spriteSize, 3);
     auto& animationW = gamemanager.animpg.CreateAnimation("animationW", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
     animationW.AddFrames(sf::Vector2i(0, gamemanager.spriteSize.y * 3), gamemanager.spriteSize, 3);
-    
-    
+
+
+   
    while (!gamemanager.getWindow()->isDone()) {
 
          gamemanager.HandleInput();
@@ -30,5 +31,5 @@ int main() {
         sf::sleep(sf::milliseconds(10)); 
         gamemanager.RestartClock();
     }
-
+   
 }
