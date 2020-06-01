@@ -3,7 +3,8 @@
 #include <iostream>
 #include "Animator.h"
 #include "AssetManager.h"
-#include "Game.h"
+#include "GameManager.h"
+
 
 using namespace sf;
 
