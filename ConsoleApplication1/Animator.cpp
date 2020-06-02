@@ -15,7 +15,6 @@ Animator::Animation& Animator::CreateAnimation(std::string const& name, std::str
 }
 void Animator::SwitchAnimation(Animator::Animation* animation) {
     
-    
     try {
       sf::Texture& texture = AssetManager::GetTexture(animation->m_TextureName);
       if (animation != nullptr)

@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML\System\Time.hpp>
+
 class StateManager;
 
 class BaseState {
@@ -22,10 +23,10 @@ public:
 	bool IsTrasparent() const {
 		return transparent;
 	}
-	void SetTrascendent(const bool& isTrascendent) {
+	void SetTranscendent(const bool& isTrascendent) {
 		transcendent = isTrascendent;
 	}
-	bool IsTrascendent() const {
+	bool IsTranscendent() const {
 		return transcendent;
 	}
 	StateManager* GetStateManager() {

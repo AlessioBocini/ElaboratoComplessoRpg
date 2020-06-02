@@ -1,8 +1,15 @@
 #pragma once
 #include <vector>
-#include "BaseState.h"
+#include <vector>
 #include <unordered_map>
-#include <functional>
+#include "Intro_State.h"
+#include "MainMenu_State.h"
+#include "Game_State.h"
+#include "Paused_State.h"
+#include "SharedContext.h"
+
+class GameManager;
+
 enum class StateType {
 	Intro = 1, MainMenu, Game, Paused, GameOver
 };
@@ -12,11 +19,11 @@ using TypeContainer = std::vector<StateType>;
 
 using StateFactory = std::unordered_map<StateType, std::function<BaseState* (void)>>;
 
-//TODO : Leggi il capitolo del Event manager, SharedContext e continua lo state pattern.
+
 class StateManager {
 public :
 
-	StateManager(SharedContext* shared);
+	StateManager(SharedContext* shared, GameManager* gm);
 	~StateManager();
 
 	void Update(const sf::Time& time);
@@ -24,20 +31,28 @@ public :
 
 	void ProcessRequests();
 
-	sharedContext* GetContext();
+	SharedContext* GetContext();
+	GameManager* GetGameManager();
 	bool HasState(const StateType& type);
 
 	void SwitchTo(const StateType& type);
 	void Remove(const StateType& type);
-
+	
 private:
 	void CreateState(const StateType& type);
 	void RemoveState(const StateType& type);
 
-	template<class T> void RegisterState(const StateType& type) {}
-
+	template<class T>
+	void RegisterState(const StateType& l_type) {
+		stateFactory[l_type] = [this]() -> BaseState*
+		{
+			return new T(this);
+		};
+	}
+	GameManager* gamemanager;
 	SharedContext* shared;
 	StateContainer states;
 	StateFactory stateFactory;
 	TypeContainer toRemove;
 };
+

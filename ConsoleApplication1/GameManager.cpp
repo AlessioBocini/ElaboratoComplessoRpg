@@ -23,20 +23,34 @@ bool GameManager::AggiungiSkill(Skill skill) {
 	return true;
 }
 
-GameManager::GameManager() : m_window("rpg game", sf::Vector2u(800, 600), false), player("alessio", sf::Vector2f(0, 0)), animpg(player.GetSprite()), spriteSize(32, 32) {
+bool GameManager::isGamePaused() {
+	return isPaused;
+}
+void GameManager::SetInPauseGame(bool pause) {
+	isPaused = pause;
+}
+Giocatore GameManager::GetGiocatore() {
+	return player;
+}
+GameManager::GameManager() : m_window("rpg game", sf::Vector2u(800, 600), false), player("alessio", sf::Vector2f(0, 0)), animpg(player.GetSprite()), spriteSize(32, 32) , stateManager(&context,this){
 
 	player.GetSprite().setTextureRect(sf::IntRect(0, 0, spriteSize.x, spriteSize.y));
+	context.wind = &m_window;
+	context.eventManager = m_window.GetEventManager();
+	stateManager.SwitchTo(StateType::Intro);
 	animpg.SwitchAnimation("animationS");
 }
 GameManager::~GameManager() {}
 
 void GameManager::Update() {
 	m_window.Update();
+	stateManager.Update(elapsed);
 }
 
 
 
 void GameManager::HandleInput() {
+	if (isPaused) return;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
 		if (animpg.GetCurrentAnimationName() != "animationA")
@@ -65,7 +79,8 @@ void GameManager::HandleInput() {
 
 void GameManager::Render() {
 	m_window.BeginDraw();
-	m_window.Draw(player.GetSprite());
+	stateManager.Draw();
+	
 	m_window.EndDraw();
 }
 
@@ -78,4 +93,9 @@ sf::Time GameManager::GetElapsed() {
 }
 void GameManager::RestartClock() {
 	elapsed = clock.restart();
+}
+
+void GameManager::LateUpdate() {
+	stateManager.ProcessRequests();
+	RestartClock();
 }

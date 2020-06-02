@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
-#include <SFML\System\Vector2.hpp>
-#include <SFML\Graphics\Drawable.hpp>
-#include <SFML\Graphics\RenderWindow.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
 #include "EventManager.h"
 
 
@@ -22,6 +22,7 @@ public:
 	
 	EventManager* GetEventManager();
 	sf::Vector2u GetwindowSize();
+	sf::RenderWindow* GetRenderWindow();
 	void ToggleFullscreen();
 	void ToggleFullscreen(EventDetails* details);
 	void Close(EventDetails* details = nullptr);
@@ -29,7 +30,7 @@ public:
 private:
 	bool isfullscreen;
 	bool isdone;
-	bool isFocused;
+	bool isfocused;
 	EventManager eventManager;
 	std::string windowTitle;
 	sf::RenderWindow window;

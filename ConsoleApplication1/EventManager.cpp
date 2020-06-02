@@ -1,4 +1,5 @@
 #include "EventManager.h"
+#include <iostream>
 
 EventManager::EventManager() :hasFocus(true) {
 	LoadBindings();
@@ -25,6 +26,13 @@ bool EventManager::RemoveBinding(std::string name) {
 	bindings.erase(it);
 
 	return true;
+}
+void EventManager::SetFocus(const bool& l_focus) { 
+	hasFocus = l_focus; 
+}
+
+void EventManager::SetCurrentState(StateType l_state) {
+	currentState = l_state;
 }
 
 void EventManager::HandleEvent(sf::Event& event) {
@@ -99,13 +107,57 @@ void EventManager::Update() {
 			}
 		}
 		if (bind->events.size() == bind->cEvents) {
-			auto callit = callbacks.find(bind->name);
-			if (callit != callbacks.end()) {
-				callit->second(&bind->details);
+			auto statecallbacks = callbacks.find(currentState);
+			auto othercallbacks = callbacks.find(StateType(0));
+
+			if (statecallbacks != callbacks.end()) {
+				auto callitr = statecallbacks->second.find(bind->name);
+				if (callitr != statecallbacks->second.end()) {
+					callitr->second(&bind->details);
+				}
+			}
+			if (othercallbacks != callbacks.end()) {
+				auto callitr = othercallbacks->second.find(bind->name);
+				if (callitr != othercallbacks->second.end()) {
+					callitr->second(&bind->details);
+				}
 			}
 		}
 		bind->cEvents = 0;
 		bind->details.clear();
 	}
 }
-void EventManager::LoadBindings(){}
+void EventManager::LoadBindings(){
+	std::string delimiter = ":";
+
+	std::ifstream _bindings;
+	_bindings.open("keys.cfg");
+	if (!_bindings.is_open()) { std::cout << "! Failed loading keys.cfg." << std::endl; return; }
+	std::string line;
+	while (std::getline(_bindings, line)) {
+		std::stringstream keystream(line);
+		std::string callbackName;
+		keystream >> callbackName;
+		Binding* bind = new Binding(callbackName);
+		while (!keystream.eof()) {
+			std::string keyval;
+			keystream >> keyval;
+			int start = 0;
+			int end = keyval.find(delimiter);
+			if (end == std::string::npos) { delete bind; bind = nullptr; break; }
+			EventType type = EventType(stoi(keyval.substr(start, end - start)));
+			int code = stoi(keyval.substr(end + delimiter.length(),
+				keyval.find(delimiter, end + delimiter.length())));
+
+			EventInfo eventInfo;
+			eventInfo.code = code;
+			bind->BindEvent(type, eventInfo);
+		}
+
+		if (!AddBinding(bind)) { delete bind; }
+		bind = nullptr;
+	}
+	_bindings.close();
+
+
+}

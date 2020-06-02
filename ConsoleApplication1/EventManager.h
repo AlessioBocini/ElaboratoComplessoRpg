@@ -5,8 +5,10 @@
 #include <SFML\Graphics\RenderWindow.hpp>
 #include <SFML\Graphics.hpp>
 #include <unordered_map>
-
+#include <fstream>
+#include <sstream>
 #include <functional>
+#include <vector>
 
 enum class EventType {
 	KeyDown = sf::Event::KeyPressed,
@@ -64,6 +66,7 @@ struct EventDetails {
 
 struct Binding {
 	Binding(const std::string& name): name(name), details(name), cEvents(0){}
+	~Binding() {}
 	void BindEvent(EventType type, EventInfo info = EventInfo()) {
 		events.emplace_back(type, info);
 	}
@@ -73,8 +76,12 @@ struct Binding {
 	EventDetails details;
 };
 
-using Callbacks = std::unordered_map<std::string, std::function<void(EventDetails*)>>;
+using CallbackContainer = std::unordered_map<std::string, std::function<void(EventDetails*)>>;
+enum class StateType;
+using Callbacks = std::unordered_map<StateType, CallbackContainer>;
 using Bindings = std::unordered_map<std::string, Binding*>;	// è un container associativo, ci sarà solo un binding per azione.
+
+
 
 class EventManager {
 public:
@@ -84,14 +91,25 @@ public:
 	bool AddBinding(Binding* binding);
 	bool RemoveBinding(std::string name);
 	void SetFocus(const bool& focus);
+
 	template<class T>
-	bool AddCallback(const std::string& name, void(T::* func)(EventDetails*), T* instance) {
-		auto temp = std::bind(func, instance, std::placeholders::_1) :
-		return callbacks.emplace(name, temp).second;
+	bool AddCallback(StateType l_state, const std::string& l_name,
+		void(T::* l_func)(EventDetails*), T* l_instance)
+	{
+		auto itr = callbacks.emplace(l_state, CallbackContainer()).first;
+		auto temp = std::bind(l_func, l_instance, std::placeholders::_1);
+		return itr->second.emplace(l_name, temp).second;
 	}
-	void RemoveCallback(const std::string& name) {
-		callbacks.erase(name);
+
+	bool RemoveCallback(StateType l_state, const std::string& l_name) {
+		auto itr = callbacks.find(l_state);
+		if (itr == callbacks.end()) { return false; }
+		auto itr2 = itr->second.find(l_name);
+		if (itr2 == itr->second.end()) { return false; }
+		itr->second.erase(l_name);
+		return true;
 	}
+	void SetCurrentState(StateType l_state);
 	void HandleEvent(sf::Event& event);
 	void Update();
 	sf::Vector2i GetMousePos(sf::RenderWindow* wind = nullptr) {
@@ -102,5 +120,6 @@ private:
 	Bindings bindings;
 	Callbacks callbacks;
 	bool hasFocus;
+	StateType currentState;
 
 };
