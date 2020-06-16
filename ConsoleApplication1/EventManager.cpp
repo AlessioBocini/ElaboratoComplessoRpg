@@ -113,13 +113,13 @@ void EventManager::Update() {
 			if (statecallbacks != callbacks.end()) {
 				auto callitr = statecallbacks->second.find(bind->name);
 				if (callitr != statecallbacks->second.end()) {
-					callitr->second(&bind->details);
+					callitr->second(&bind->details);	// implemento il wrapper della funzione passando details
 				}
 			}
 			if (othercallbacks != callbacks.end()) {
 				auto callitr = othercallbacks->second.find(bind->name);
 				if (callitr != othercallbacks->second.end()) {
-					callitr->second(&bind->details);
+					callitr->second(&bind->details); // implemento il wrapper della funzione passando details
 				}
 			}
 		}

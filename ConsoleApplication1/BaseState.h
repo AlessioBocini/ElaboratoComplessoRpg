@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML\System\Time.hpp>
 
-class StateManager;
+class StateManager; //faccio una forward declaration. inoltre il Base State non ha bisogno di conoscere niente di StateManager.
+					// inoltre mi serve per evitare una definizione ricorsiva dello state manager (al suo interno contiene BaseState)
 
 class BaseState {
 	friend class StateManager;

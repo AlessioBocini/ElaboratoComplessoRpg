@@ -28,7 +28,7 @@ public:
 
 	bool isButtonPressedSKill(std::string const& buttonPressed);
 	bool AggiungiSkill(Skill skill);
-	void SetInPauseGame(bool value);
+	void SetInPauseGame(bool value); 
 	bool isGamePaused();
 	bool isGameOver();
 	bool LoadGame();

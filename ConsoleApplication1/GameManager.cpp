@@ -48,7 +48,7 @@ void GameManager::Update() {
 }
 
 
-
+/// TODO se il giocatore smette di muoversi, l'animazione non deve continuare.
 void GameManager::HandleInput() {
 	if (isPaused) return;
 

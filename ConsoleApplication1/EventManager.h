@@ -42,6 +42,9 @@ struct EventInfo {
 using Events = std::vector<std::pair<EventType, EventInfo>>;
 
 
+// classe che contiene le informazioni in dettaglio su un evento
+// se premo un tasto del mouse segno quale è
+//se scrivo una parola, viene inserita pure qui etc etc
 struct EventDetails {
 	EventDetails(const std::string& bindName) : name(bindName) {
 		clear();
@@ -51,7 +54,7 @@ struct EventDetails {
 	sf::Vector2i size;
 	sf::Uint32 textEntered;
 	sf::Vector2i mouse;
-	int mouseWheelDelta;
+	int mouseWheelDelta; // angolo
 	int keyCode; //key code singolo.
 
 	void clear() {
@@ -63,7 +66,7 @@ struct EventDetails {
 	}
 };
 
-
+// struttura per poter mettere assieme le informazioni su un evento con i dettagli.
 struct Binding {
 	Binding(const std::string& name): name(name), details(name), cEvents(0){}
 	~Binding() {}
@@ -76,19 +79,28 @@ struct Binding {
 	EventDetails details;
 };
 
-using CallbackContainer = std::unordered_map<std::string, std::function<void(EventDetails*)>>;
+
+using CallbackContainer = std::unordered_map<std::string, std::function<void(EventDetails*)>>; // Il callbackContainer non è altro che un container associativo
+																							   // per fare il collegamento tra una stringa ed una 
+																							   // relativa funzione di Callback
+
+
 enum class StateType;
-using Callbacks = std::unordered_map<StateType, CallbackContainer>;
-using Bindings = std::unordered_map<std::string, Binding*>;	// è un container associativo, ci sarà solo un binding per azione.
+using Callbacks = std::unordered_map<StateType, CallbackContainer>; // è un container associativo per fare il collegamento tra 
+																	// uno StateType e un CallbackContainer.
 
 
+using Bindings = std::unordered_map<std::string, Binding*>;	// è un container associativo, ci sarà solo un binding per azione, 
+															// l'azione è specificata da un nome.
 
+
+//classe manager vera e propria
 class EventManager {
 public:
 	EventManager();
 	~EventManager();
 
-	bool AddBinding(Binding* binding);
+	bool AddBinding(Binding* binding);	
 	bool RemoveBinding(std::string name);
 	void SetFocus(const bool& focus);
 
@@ -96,15 +108,16 @@ public:
 	bool AddCallback(StateType l_state, const std::string& l_name,
 		void(T::* l_func)(EventDetails*), T* l_instance)
 	{
-		auto itr = callbacks.emplace(l_state, CallbackContainer()).first;
+		auto itr = callbacks.emplace(l_state, CallbackContainer()).first; // restituisce un iterator all'elemento creato o esistente
 		auto temp = std::bind(l_func, l_instance, std::placeholders::_1);
-		return itr->second.emplace(l_name, temp).second;
+		return itr->second.emplace(l_name, temp).second; // il secondo membro è un booleano che dipende dal successo o meno del inserimento.
+														// qui inseriamo il valore vero e proprio 
 	}
 
 	bool RemoveCallback(StateType l_state, const std::string& l_name) {
 		auto itr = callbacks.find(l_state);
 		if (itr == callbacks.end()) { return false; }
-		auto itr2 = itr->second.find(l_name);
+		auto itr2 = itr->second.find(l_name);	//nome della stringa associata ad una funzione di callback
 		if (itr2 == itr->second.end()) { return false; }
 		itr->second.erase(l_name);
 		return true;

@@ -1,10 +1,11 @@
 #include "MainMenu_State.h"
 #include "StateManager.h"
-
+#include "GameManager.h"
 State_MainMenu::State_MainMenu(StateManager* l_stateManager) : BaseState(l_stateManager){}
 State_MainMenu::~State_MainMenu(){}
 
 void State_MainMenu::OnCreate() {
+	stateManager->GetGameManager()->SetInPauseGame(true);
 	font.loadFromFile("arial.ttf");
 	text.setFont(font);
 	text.setString(sf::String("Main Menu"));
@@ -19,7 +20,7 @@ void State_MainMenu::OnCreate() {
 
 	std::string str[3];
 	str[0] = "PLAY";
-	str[1] = "CREDITS";
+	str[1] = "SAVE";
 	str[2] = "QUIT";
 
 	for (int i = 0; i < 3; ++i) {

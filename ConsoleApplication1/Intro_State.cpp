@@ -1,13 +1,15 @@
 #include "Intro_State.h"
 #include "StateManager.h"
+#include "GameManager.h"
 State_Intro::State_Intro(StateManager* l_stateManager): BaseState(l_stateManager) {}
 
 State_Intro::~State_Intro() {}
 
 void State_Intro::OnCreate() {
+	stateManager->GetGameManager()->SetInPauseGame(true);
 	timePassed = 0.0f;
 	sf::Vector2u windowSize = stateManager->GetContext()->wind->GetRenderWindow()->getSize();
-	introTexture.loadFromFile("intro.png");
+	introTexture.loadFromFile("../assets/images/intro.png");
 	introSprite.setTexture(introTexture);
 	introSprite.setOrigin(introTexture.getSize().x / 2.0f, introTexture.getSize().y / 2.0f);
 	introSprite.setPosition(windowSize.x / 2.0f, windowSize.y / 2.0f);
