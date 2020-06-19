@@ -27,6 +27,7 @@ public:
 	void ToggleFullscreen(EventDetails* details);
 	void Close(EventDetails* details = nullptr);
 	void Draw(sf::Drawable& drawable);
+	sf::FloatRect GetViewSpace();
 private:
 	bool isfullscreen;
 	bool isdone;

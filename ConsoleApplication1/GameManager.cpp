@@ -1,4 +1,7 @@
+
+
 #include "GameManager.h"
+#include <iostream>
 
 bool GameManager::CheckForLevelUp() {
 
@@ -32,49 +35,91 @@ void GameManager::SetInPauseGame(bool pause) {
 Giocatore GameManager::GetGiocatore() {
 	return player;
 }
-GameManager::GameManager() : m_window("rpg game", sf::Vector2u(800, 600), false), player("alessio", sf::Vector2f(0, 0)), animpg(player.GetSprite()), spriteSize(32, 32) , stateManager(&context,this){
-
+GameManager::GameManager() : m_window("rpg game", sf::Vector2u(1366, 720), false), world(&context),  animpg(player.GetSprite()), spriteSize(32, 32) , stateManager(&context,this), player("alessio",sf::Vector2f(0,0)), isPaused(false) {
 	player.GetSprite().setTextureRect(sf::IntRect(0, 0, spriteSize.x, spriteSize.y));
+	player.setContext(&context);
+	context.gameMap = &world;
 	context.wind = &m_window;
 	context.eventManager = m_window.GetEventManager();
+	context.gameManager = this;
+	context.assetManager = &assetmanager;
 	stateManager.SwitchTo(StateType::Intro);
 	animpg.SwitchAnimation("animationS");
+	
+	world.LoadMap("D:/visualstudioprojects/ConsoleApplication1/assets/files/map1.txt");
+	player.setSpawnPoint(world.GetPlayerStartpoint());
+	
 }
 GameManager::~GameManager() {}
 
+
 void GameManager::Update() {
+
+
 	m_window.Update();
 	stateManager.Update(elapsed);
+	player.CheckCollisions(&context);
+	player.ResolveCollisions(&context);
+	if (!isPaused) {
+		world.Update(elapsed);
+
+	}
+		
 }
 
 
-/// TODO se il giocatore smette di muoversi, l'animazione non deve continuare.
 void GameManager::HandleInput() {
+
+	bool pressedkey = false;
 	if (isPaused) return;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
 		if (animpg.GetCurrentAnimationName() != "animationA")
 			animpg.SwitchAnimation("animationA");
-		player.Movimento(-1 * player.GetVelocita(), 0);
+		if (!player.isblockedA) {
+			player.Movimento(-1 * player.GetVelocita(), 0);
+		
+		}
+			
+		pressedkey = true;
 
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
 		if (animpg.GetCurrentAnimationName() != "animationD")
 			animpg.SwitchAnimation("animationD");
-		player.Movimento(player.GetVelocita(), 0);
+		if (!player.isblockedD) {
+			player.Movimento(player.GetVelocita(), 0);
+		}
+			
+		pressedkey = true;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 		if (animpg.GetCurrentAnimationName() != "animationW")
 			animpg.SwitchAnimation("animationW");
-		
-		player.Movimento(0, -1 * player.GetVelocita());
+
+		if (!player.isblockedW) {
+			player.Movimento(0, -1 * player.GetVelocita());
+		}
+			
+		pressedkey = true;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
 		if (animpg.GetCurrentAnimationName() != "animationS")
 			animpg.SwitchAnimation("animationS");
-		player.Movimento(0, player.GetVelocita());
+
+		if (!player.isblockedS) {
+			player.Movimento(0, player.GetVelocita());
+		}
+			
+		pressedkey = true;
+
 	}
-	animpg.update(elapsed);
+	if (pressedkey) {
+		
+		animpg.update(elapsed);
+	}
+		
+	
 }
 
 void GameManager::Render() {

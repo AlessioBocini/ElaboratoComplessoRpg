@@ -36,7 +36,6 @@ public :
 	void ProcessRequests();
 
 	SharedContext* GetContext();
-	GameManager* GetGameManager();
 	bool HasState(const StateType& type);
 
 	void SwitchTo(const StateType& type);
@@ -54,7 +53,6 @@ private:
 			return new T(this);
 		};
 	}
-	GameManager* gamemanager;
 	SharedContext* shared;
 	StateContainer states;
 	StateFactory stateFactory;

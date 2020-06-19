@@ -21,8 +21,6 @@ public:
 	void Pause(EventDetails* details);
 
 private:
-	//sf::Texture texture;
 	sf::Sprite& sprite;
 	sf::Vector2f increment;
-
 };

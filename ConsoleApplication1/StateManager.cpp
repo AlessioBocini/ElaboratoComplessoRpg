@@ -3,7 +3,8 @@
 
 
 
-StateManager::StateManager(SharedContext* shared, GameManager*gm) : shared(shared) , gamemanager(gm) {
+StateManager::StateManager(SharedContext* shared, GameManager*gm) : shared(shared)  {
+
 	RegisterState<State_Intro>(StateType::Intro); //lo stato State_Intro adesso ha una memoria allocata.
 	RegisterState<State_MainMenu>(StateType::MainMenu);
 	RegisterState<State_Game>(StateType::Game);
@@ -68,9 +69,9 @@ void StateManager::Update(const sf::Time& time) {
 SharedContext* StateManager::GetContext() {
 	return shared;
 }
-GameManager* StateManager::GetGameManager() {
+/*GameManager* StateManager::GetGameManager() {
 	return gamemanager;
-}
+}*/
 
 /*controllo tra tutti gli stati se esiste un dato stato in input, controlla se è presente nello stack toRemove.
  in caso affermativo ritorna true altrimenti falso.*/

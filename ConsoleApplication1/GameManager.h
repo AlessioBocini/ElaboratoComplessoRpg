@@ -5,13 +5,14 @@
 #include "Giocatore.h"
 #include "AssetManager.h"
 #include "StateManager.h"
-
+#include "Mondo.h"
 
 class GameManager {
-private:
 
 public:
+	
 	Animator animpg;
+	sf::Sprite mockrect;
 	sf::Vector2i spriteSize;
 	GameManager();
 	~GameManager();
@@ -35,17 +36,19 @@ public:
 	bool SaveGame();
 	bool CheckForLevelUp();
 	void RegenStamina();
-
+	
 private:
 	Window m_window;
 
 	Giocatore player;
-
+	
+	sf::Vector2f beginPlayerpos;
 	bool isPaused;
 
 	AssetManager assetmanager;
 	StateManager stateManager;
 	SharedContext context;
+	Mondo world;
 	sf::Clock clock;
 	sf::Time elapsed;
 

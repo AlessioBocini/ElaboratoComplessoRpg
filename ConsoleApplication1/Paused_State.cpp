@@ -1,4 +1,4 @@
-#include "Paused_State.h"
+
 #include "StateManager.h"
 #include "GameManager.h"
 
@@ -16,7 +16,7 @@ void State_Paused::OnCreate() {
 	text.setString(sf::String("PAUSED"));
 	text.setCharacterSize(14);
 	text.setStyle(sf::Text::Bold);
-	stateManager->GetGameManager()->SetInPauseGame(true);
+	stateManager->GetContext()->gameManager->SetInPauseGame(true);
 	sf::Vector2u windowSize = stateManager->GetContext()->wind->GetRenderWindow()->getSize();
 
 	sf::FloatRect textRect = text.getLocalBounds();
@@ -44,7 +44,7 @@ void State_Paused::Draw() {
 }
 
 void State_Paused::Unpause(EventDetails* l_details) {
-	stateManager->GetGameManager()->SetInPauseGame(false);
+	stateManager->GetContext()->gameManager->SetInPauseGame(false);
 	stateManager->SwitchTo(StateType::Game);
 }
 

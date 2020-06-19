@@ -1,11 +1,14 @@
-#include "MainMenu_State.h"
+
 #include "StateManager.h"
 #include "GameManager.h"
-State_MainMenu::State_MainMenu(StateManager* l_stateManager) : BaseState(l_stateManager){}
+State_MainMenu::State_MainMenu(StateManager* l_stateManager) : BaseState(l_stateManager),buttonPadding(4){
+
+}
 State_MainMenu::~State_MainMenu(){}
 
 void State_MainMenu::OnCreate() {
-	stateManager->GetGameManager()->SetInPauseGame(true);
+	stateManager->GetContext()->gameManager->SetInPauseGame(true);
+	sf::Vector2u windowSize = stateManager->GetContext()->wind->GetRenderWindow()->getSize();
 	font.loadFromFile("arial.ttf");
 	text.setFont(font);
 	text.setString(sf::String("Main Menu"));
@@ -13,9 +16,10 @@ void State_MainMenu::OnCreate() {
 
 	sf::FloatRect textRect = text.getLocalBounds();
 	text.setOrigin(textRect.left + textRect.width / 2.0f,textRect.top+textRect.height/2.0f);
-	text.setPosition(400, 100);
+	text.setPosition(windowSize.x / 2.0f, 100);
+	//text.setPosition(400, 100);
 	buttonSize = sf::Vector2f(300.0f, 32.0f);
-	buttonPos = sf::Vector2f(400.0f, 200.0f);
+	buttonPos = sf::Vector2f(windowSize.x/2, 200.0f);
 	buttonPadding = 4; //4px
 
 	std::string str[3];
