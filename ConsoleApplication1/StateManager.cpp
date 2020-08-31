@@ -35,6 +35,7 @@ void StateManager::Draw() {
 			--it;
 		}
 		for (; it != states.end(); ++it) {
+			shared->wind->GetRenderWindow()->setView(it->second->GetView());
 			it->second->Draw(); //disegna il primo BaseState non trasparente
 		}
 	}
@@ -111,7 +112,9 @@ void StateManager::SwitchTo(const StateType& type) {
 			BaseState* tmp_state = it->second;
 			states.erase(it); //elimino lo stato per poi inserirlo in fondo (per il calcolo successivo)
 			states.emplace_back(tmp_type, tmp_state); 
+			
 			tmp_state->Activate(); //attivo il nuovo BaseState.
+			shared->wind->GetRenderWindow()->setView(tmp_state->GetView());
 			return;
 		}
 	}
@@ -122,13 +125,15 @@ void StateManager::SwitchTo(const StateType& type) {
 	//è necessario creare lo stato per inizializzare lo stato.
 	CreateState(type);
 	states.back().second->Activate();
-
+	states.back().second->Activate();
+	shared->wind->GetRenderWindow()->setView(states.back().second->GetView());
 }
 
 void StateManager::CreateState(const StateType& type) {
 	auto newState = stateFactory.find(type); //controllo se esiste uno stato registrato simile a questo inserito.
 	if (newState == stateFactory.end()) return;
 	BaseState* state = newState->second(); //assegno la memoria ritornata dalla funzione.
+	state->view = shared->wind->GetRenderWindow()->getDefaultView();	
 	states.emplace_back(type, state);
 	state->OnCreate(); //dipende dall'implementazione interna della funzione in ciascuno stato. (BaseState è astratta)
 }

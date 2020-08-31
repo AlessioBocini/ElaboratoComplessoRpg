@@ -8,15 +8,12 @@ void Giocatore::Attacco( bool isSkill) {
 }
 
 
-void Giocatore::Movimento(int x , int y) {
-
-	
-
+void Giocatore::Movimento(float x , float y) {
 	oldPosition = position;	
 	position += sf::Vector2f(x, y);
-	GetSprite().move(x, y);
+	sprite.move(x, y);
 
-	updateCollRect();
+	updateCollRect(); //aggiorna le informazioni sulle collisioni
 }
 
 bool Giocatore::EquipArmor(Armatura const& obj) {

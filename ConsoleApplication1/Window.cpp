@@ -13,10 +13,10 @@ Window::~Window() {
 	Destroy();
 }
 sf::FloatRect Window::GetViewSpace() {
-	sf::Vector2f viewCenter(window.getView().getCenter());
-	sf::Vector2f viewSize(window.getView().getSize());
-	sf::Vector2f viewSizeHalf(viewSize.x / 2, viewSize.y / 2);
-	sf::FloatRect viewSpace(viewCenter - viewSizeHalf, viewSize);
+	sf::Vector2f viewCenter(window.getView().getCenter()); // prendo il centro della finestra in coords
+	sf::Vector2f viewSize(window.getView().getSize()); // prendo lo spazio totale della finestra in coords
+	sf::Vector2f viewSizeHalf(viewSize.x / 2, viewSize.y / 2); // prendo la meta della finestra in coords
+	sf::FloatRect viewSpace(viewCenter - viewSizeHalf, viewSize); // definisco il rettangolo visibile come centro-metà per largezza e size normale per altezza
 	return viewSpace;
 }
 void Window::Setup(const std::string title, const sf::Vector2u& size, bool fullscreen) {

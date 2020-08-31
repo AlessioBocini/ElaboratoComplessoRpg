@@ -27,7 +27,6 @@ struct TileInfo {
 	}
 	~TileInfo() {
 		animation.clear();
-
 	}
 	sf::Sprite sprite;
 	Animator anim;
@@ -35,7 +34,6 @@ struct TileInfo {
 	TileId id;
 	std::string name;
 	sf::Vector2f friction;
-
 	bool deadly;
 	bool blocked;
 	std::string texture;
@@ -47,4 +45,9 @@ struct Tile {
 
 	TileInfo* properties;
 	bool teleport;
+	std::string nextMap;
+	Tile():teleport(false),properties(nullptr){}
+	~Tile() {
+		
+	}
 };

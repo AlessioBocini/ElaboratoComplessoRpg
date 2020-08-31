@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML\System\Time.hpp>
-
+#include "Window.h"
 class StateManager; //faccio una forward declaration. inoltre il Base State non ha bisogno di conoscere niente di StateManager.
 					// inoltre mi serve per evitare una definizione ricorsiva dello state manager (al suo interno contiene BaseState)
 
@@ -27,9 +27,11 @@ public:
 	void SetTranscendent(const bool& isTrascendent) {
 		transcendent = isTrascendent;
 	}
+
 	bool IsTranscendent() const {
 		return transcendent;
 	}
+	sf::View& GetView() { return view; }
 	StateManager* GetStateManager() {
 		return stateManager;
 	}
@@ -37,4 +39,5 @@ protected:
 	bool transparent;
 	bool transcendent;
 	StateManager* stateManager;
+	sf::View view;
 };

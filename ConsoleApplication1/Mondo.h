@@ -14,12 +14,12 @@ class Mondo {
 private:
 	TileId GetTileIdByCoords( int x,  int y);
 	void LoadTiles(const std::string& path);
-	void EraseMap();
+	
 	void EraseTileSet();
 	SharedContext* context;
 	BaseState* currentState;
-	/*bool loadNextMap;
-	std::string nextMap;*/
+	bool loadNextMap;
+	std::string nextMap;
 	//float mapGravity; se aggiungessi la possibilità di saltare.
 	unsigned int tileSetCount;
 	unsigned int tileCount;
@@ -29,16 +29,20 @@ private:
 	TileMap tileMap;
 	int nTerritori;
 	std::vector<Territorio> territori;
+	std::string lastMap;
 public:
 	Mondo(SharedContext* context);
 	~Mondo();
+	void EraseMap();
+	std::string GetPrevMap();
+	void SetPrevMap(std::string previous_map);
 	Tile* GetTileByCoords( int x,  int y);
 	TileInfo* GetDefaultTile();
 	unsigned int GetTileSize() const;
 	const sf::Vector2u& GetMapSize() const;
 	const sf::Vector2f& GetPlayerStartpoint() const;
-	void LoadMap(const std::string& path);
-	//void LoadNext();
+	void SetPlayerStartpoint(const sf::Vector2f& newpos);
+	void LoadMap(const std::string& path,bool first);
 	void Update(sf::Time const& dt);
 	void Draw();
 	int GetNTerritori() {

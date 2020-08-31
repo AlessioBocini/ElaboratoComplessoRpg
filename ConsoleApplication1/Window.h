@@ -27,7 +27,7 @@ public:
 	void ToggleFullscreen(EventDetails* details);
 	void Close(EventDetails* details = nullptr);
 	void Draw(sf::Drawable& drawable);
-	sf::FloatRect GetViewSpace();
+	sf::FloatRect GetViewSpace(); // funzione che ritorna lo spazio visibile nella mappa.
 private:
 	bool isfullscreen;
 	bool isdone;

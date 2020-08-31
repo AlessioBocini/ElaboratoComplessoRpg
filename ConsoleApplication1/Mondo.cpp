@@ -1,7 +1,7 @@
 #include "Mondo.h"
 #include "GameManager.h"
 #include <iostream>
-Mondo::Mondo(SharedContext* context):context(context),tileCount(0),tileSetCount(0),maxMapSize(400,200)/*, loadNextMap(false)*/{
+Mondo::Mondo(SharedContext* context):context(context),tileCount(0),tileSetCount(0),maxMapSize(400,200), lastMap(""){
 	context->gameMap = this;
 	LoadTiles("D:/visualstudioprojects/ConsoleApplication1/assets/files/tiles.txt");
 }
@@ -25,8 +25,10 @@ TileId Mondo::GetTileIdByCoords( int x,  int y) {
 }
 
 void Mondo::EraseMap() {
-	/*for (auto it = tileMap.begin(); it != tileMap.end(); it++)
-		delete it->second;*/
+	/*for (auto it = tileMap.begin(); it != tileMap.end(); it++) {
+		delete it->second;
+	}*/
+		
 	tileCount = 0;
 	tileMap.clear();
 	//TODO potrei aver bisogno di un manager di entità?
@@ -44,6 +46,9 @@ void Mondo::EraseTileSet() {
 const sf::Vector2f& Mondo::GetPlayerStartpoint() const {
 
 	return playerStartPoint;
+}
+void Mondo::SetPlayerStartpoint(const sf::Vector2f& newpos) {
+	playerStartPoint = newpos;
 }
 const sf::Vector2u& Mondo::GetMapSize() const {
 	return maxMapSize;
@@ -71,31 +76,83 @@ void Mondo::LoadTiles(const std::string& filepath) {
 			tile->animation.push_back(animation);
 			tile->anim.SwitchAnimation("animationTerra");
 		}
-		if (tileId == 3) {
+		else if (tileId == 3) {
 				tile->sprite.setTextureRect(sf::IntRect(0, 0,Sheet::Tile_Size*2, Sheet::Tile_Size*2 ));
 				auto& animation = tile->anim.CreateAnimation("animationAcquaGrande", texture, sf::seconds(1), true);
 				animation.AddFrames(sf::Vector2i(0, Sheet::Tile_Size), sf::Vector2i(Sheet::Tile_Size*2, Sheet::Tile_Size*2), 3);
 				tile->animation.push_back(animation);
 				tile->anim.SwitchAnimation("animationAcquaGrande");	
 		}
-		if(tileId == 2 ) {
+		else if(tileId == 2 ) {
 			auto& animation = tile->anim.CreateAnimation("animationStradapiccola", texture, sf::seconds(1), true);
 			animation.AddFrames(sf::Vector2i(Sheet::Tile_Size*3, 0), sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size), 1);
 			tile->animation.push_back(animation);
 			tile->anim.SwitchAnimation("animationStradapiccola");
 			
 		}
-		if (tileId == 4) {
+		else if (tileId == 4) {
 			auto& animation = tile->anim.CreateAnimation("animationMuro", texture, sf::seconds(1), true);
 			animation.AddFrames(sf::Vector2i(0, Sheet::Tile_Size*2), sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size), 1);
 			tile->animation.push_back(animation);
 			tile->anim.SwitchAnimation("animationMuro");
 		}
-		if (tileId == 5) {
+		else if (tileId == 5) {
 			auto& animation = tile->anim.CreateAnimation("animationCespuglio", texture, sf::seconds(1), true);
 			animation.AddFrames(sf::Vector2i(0, Sheet::Tile_Size), sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size), 1);
 			tile->animation.push_back(animation);
 			tile->anim.SwitchAnimation("animationCespuglio");
+		}
+		else if (tileId == 9) {
+			auto& animation = tile->anim.CreateAnimation("animationMuroCasa", texture, sf::seconds(1), true);
+			animation.AddFrames(sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size*2), sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size), 1);
+			tile->animation.push_back(animation);
+			tile->anim.SwitchAnimation("animationMuroCasa");
+		}
+		else if (tileId == 10) {
+			auto& animation = tile->anim.CreateAnimation("animationPavimentoCasa", texture, sf::seconds(1), true);
+			animation.AddFrames(sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size), sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size), 1);
+			tile->animation.push_back(animation);
+			tile->anim.SwitchAnimation("animationPavimentoCasa");
+		}
+		else if (tileId == 11) { //letto
+			auto& animation = tile->anim.CreateAnimation("animationLetto", texture, sf::seconds(1), true);
+			animation.AddFrames(sf::Vector2i(0, Sheet::Tile_Size*4), sf::Vector2i(Sheet::Tile_Size*2, Sheet::Tile_Size), 1);
+			tile->animation.push_back(animation);
+			tile->anim.SwitchAnimation("animationLetto");
+		}
+		else if (tileId == 12) { //sedia1 <
+			auto& animation = tile->anim.CreateAnimation("animationSedia1", texture, sf::seconds(1), true);
+			animation.AddFrames(sf::Vector2i(Sheet::Tile_Size , Sheet::Tile_Size * 3), sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size), 1);
+			tile->animation.push_back(animation);
+			tile->anim.SwitchAnimation("animationSedia1");
+		}
+		else if (tileId == 13) { //sedia2 >
+			auto& animation = tile->anim.CreateAnimation("animationSedia2", texture, sf::seconds(1), true);
+			animation.AddFrames(sf::Vector2i(Sheet::Tile_Size * 2, Sheet::Tile_Size * 3), sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size), 1);
+			tile->animation.push_back(animation);
+			tile->anim.SwitchAnimation("animationSedia2");
+		}
+		else if (tileId == 14) { // tavolo
+			auto& animation = tile->anim.CreateAnimation("animationTavolino", texture, sf::seconds(1), true);
+			animation.AddFrames(sf::Vector2i(0, Sheet::Tile_Size * 3), sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size), 1);
+			tile->animation.push_back(animation);
+			tile->anim.SwitchAnimation("animationTavolino");
+			
+		}
+		else if (tileId == 15) { //Scrivania
+
+		}
+		else if (tileId == 16) {
+			auto& animation = tile->anim.CreateAnimation("animationTeleport", texture, sf::seconds(1), true);
+			animation.AddFrames(sf::Vector2i(0, Sheet::Tile_Size * 6), sf::Vector2i(Sheet::Tile_Size, Sheet::Tile_Size), 1);
+			tile->animation.push_back(animation);
+			tile->anim.SwitchAnimation("animationTeleport");
+		}
+		else if (tileId == 17) {
+			auto& animation = tile->anim.CreateAnimation("animationCasa", texture, sf::seconds(1), true);
+			animation.AddFrames(sf::Vector2i(0, 0), sf::Vector2i(Sheet::Tile_Size*3, Sheet::Tile_Size*3), 1);
+			tile->animation.push_back(animation);
+			tile->anim.SwitchAnimation("animationCasa");
 		}
 		if (!tileSet.emplace(tileId, tile).second) {
 			// Duplicate tile detected!
@@ -105,10 +162,10 @@ void Mondo::LoadTiles(const std::string& filepath) {
 	}
 	file.close();
 }
-void Mondo::LoadMap(const std::string& filepath) {
+void Mondo::LoadMap(const std::string& filepath, bool first) {
 	/*
 	T = terra
-
+	t = teleport
 	S0 = strada Grande TODO
 	00
 	
@@ -119,7 +176,7 @@ void Mondo::LoadMap(const std::string& filepath) {
 
 	a = acqua piccola TODO
 	P = Player
-	N = Nemico TODO
+	N = Nemico1 17
 	n = npc TODO
 	# = muro
 
@@ -131,9 +188,20 @@ void Mondo::LoadMap(const std::string& filepath) {
 	f0 = albero TODO
 	00
 
+	m = muro casa
+	m = casa se in mappe diverse da Casa.
+	p = pavimento casa
+
+	< = sedia 1
+	> = sedia 2
+	? = tavolo
+	! = scrivania
+	l = letto
 	*/
-	std::ifstream file;
-	file.open(filepath);
+	std::string path = "D:/visualstudioprojects/ConsoleApplication1/assets/files/" ;
+	std::string postfix = ".map";
+	std::ifstream file ;
+	file.open(path+filepath+postfix);
 	if (!file.is_open()) { std::cout << "! Failed loading map file: " << filepath << std::endl; return; }
 	std::string map;
 	std::string line;
@@ -145,7 +213,7 @@ void Mondo::LoadMap(const std::string& filepath) {
 		char letter = 'l';
 		
 		keystream >> line;
-		std::cout << line << std::endl;
+		
 		for (int i = 0; i < line.length(); i++) {
 			isEntity = false;
 			letter = line[i];
@@ -162,8 +230,14 @@ void Mondo::LoadMap(const std::string& filepath) {
 					break;
 				}
 				case 'P': {
-					tileid = 1;
-					playerStartPoint = sf::Vector2f(i, k);
+					if (filepath == "casa")
+						tileid = 10;
+					else if (filepath == "map1") {
+						tileid = 1;
+					}
+					if(first)
+						playerStartPoint = sf::Vector2f(i, k);
+					
 					break;
 				}
 				case 'T': {
@@ -194,14 +268,56 @@ void Mondo::LoadMap(const std::string& filepath) {
 					tileid = 5;
 					break;
 				}
+				case 'm': {
+					if (filepath == "casa")
+						tileid = 9;
+					else
+						tileid = 17;
+					break;
+				}
+				case 'p': {
+					tileid = 10;
+					break;
+				}
+				case 'l': {
+					
+					tileid = 11;
+					break;
+				}
+				case '<':{
+					tileid = 12;
+					break;
+				}
+				case '>': {
+					tileid = 13;
+					break;
+				}
+				case '?': {
+					tileid = 14;
+					break;
+				}
+				case '!': {
+					tileid = 15;
+					break;
+				}
+				case 't': {
+					if (!first)
+						playerStartPoint = sf::Vector2f(i, k);
+					tileid = 16;
+					break;
+				}
 				default: {
 					std::cout << "error occurred" << std::endl;
 					break;
 				}
 			}
 			auto itr = tileSet.find(tileid);
+
+			
 			if (itr == tileSet.end())
 					continue;
+
+			
 			sf::Vector2i tileCoords = sf::Vector2i(i, k );
 			
 			if (tileCoords.x > maxMapSize.x || tileCoords.y > maxMapSize.y) {
@@ -211,7 +327,18 @@ void Mondo::LoadMap(const std::string& filepath) {
 
 			Tile* tile = new Tile();
 			tile->properties = itr->second;
-
+			tile->teleport = false;
+			if (16 == tileid) {
+				if (filepath == "casa") {
+					tile->teleport = true;
+					tile->nextMap = "map1";
+				}
+				if (filepath == "map1") {
+					tile->teleport = true;
+					tile->nextMap = "casa";
+				}
+			}
+			
 			if (!tileMap.emplace(GetTileIdByCoords(tileCoords.x, tileCoords.y), tile).second)
 			{
 				// Duplicate tile detected!
@@ -227,31 +354,38 @@ void Mondo::LoadMap(const std::string& filepath) {
 
 
 }
+
+std::string Mondo::GetPrevMap() {
+	return lastMap;
+}
+void Mondo::SetPrevMap(std::string previous_map) {
+	lastMap = previous_map;
+}
 void Mondo::Update(sf::Time const& dt) {
 	for (auto it : tileMap) {
 			it.second->properties->anim.update(dt);
 	}
 
-	sf::FloatRect viewSpace = context->wind->GetViewSpace();
-	//background.setPosition(viewspace.left, viewspace.top);
 }
 void Mondo::Draw() {
 	sf::RenderWindow* wind = context->wind->GetRenderWindow();
-	sf::FloatRect viewSpace = context->wind->GetViewSpace();
-	//wind->draw(background);
-	sf::Vector2i tileBegin(floor(viewSpace.left / Sheet::Tile_Size), floor(viewSpace.top / Sheet::Tile_Size));
-	sf::Vector2i tileEnd(ceil((viewSpace.left + viewSpace.width) / Sheet::Tile_Size),ceil((viewSpace.top + viewSpace.height) / Sheet::Tile_Size));
+	sf::FloatRect viewSpace = context->wind->GetViewSpace(); // ottengo il rettangolo visibile.
+	//ottengo l'insieme dei tile (iniziali e finali) visibili entro la finestra del rettangolo visibile.
+	sf::Vector2i tileBegin(floor(viewSpace.left / Sheet::Tile_Size), floor(viewSpace.top / Sheet::Tile_Size)); //dimensioni finestra visibile in coordinate sinistra e top, per difetto
+	sf::Vector2i tileEnd(ceil((viewSpace.left + viewSpace.width) / Sheet::Tile_Size),ceil((viewSpace.top + viewSpace.height) / Sheet::Tile_Size)); //dimensioni finestra visibile in coordinate sinistra + larghezza e top + altezza, per eccesso.
+	//( sempre diviso il tileSize per ottenere i tile, e non i pixel ).
 	unsigned int count = 0;
-	for (int x = tileBegin.x; x <= tileEnd.x; ++x) {
-		for (int y = tileBegin.y; y <= tileEnd.y; ++y) {
+	// l'unica cosa cambiata in questo for-loop è il fatto che ora il display è fatto usando tileBegin e tileEnd di viewSpace,
+	// prima infatti tileBegin e tileEnd si ottenevano dalla finestra/mappa completa di gioco, e non una sua porzione visibile.
+	for (int x = tileBegin.x -10; x <= tileEnd.x; ++x) { 
+		for (int y = tileBegin.y; y <= tileEnd.y +10; ++y) {
 			if (x < 0 || y < 0) { continue; }
 			Tile* tile = GetTileByCoords(x, y);
 			if (!tile) { continue; }
 			sf::Sprite& sprite = tile->properties->sprite;
-			sprite.setPosition(x * Sheet::Tile_Size, y * Sheet::Tile_Size);
+			sprite.setPosition((float)x * Sheet::Tile_Size,(float) y * Sheet::Tile_Size);
 			wind->draw(sprite);
 			++count;
-
 		}
 	}
 }

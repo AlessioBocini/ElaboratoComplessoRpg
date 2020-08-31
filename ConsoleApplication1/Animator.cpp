@@ -42,7 +42,7 @@ Animator::Animation* Animator::FindAnimation(std::string const& name) {
     return nullptr;
 }
 std::string Animator::GetCurrentAnimationName() const {
-    if (m_currentAnimation != nullptr) {
+if (m_currentAnimation != nullptr) {
         return m_currentAnimation->m_Name;
     }
     return "";
