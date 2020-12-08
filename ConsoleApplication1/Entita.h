@@ -5,19 +5,21 @@
 #include "SharedContext.h"
 #include "Collisione.h"
 #include "Animator.h"
-enum class EntityType { Enemy, MiniBoss, Player};
-enum class EntityState {Idle, Walking, Attacking, Dying};
+enum class EntityType { Enemy, MiniBoss, Player, Shopkeeper, Guard };
+enum class EntityState { Idle, Walking, Attacking, Dying };
 using AnimSet = Animator::Animation;
 class Entita {
 public:
-	virtual void Movimento(float x , float y) = 0;
+	virtual void Movimento(float x, float y) = 0;
 	virtual void Attacco(bool isSkill) = 0;
 
 	bool isblockedW;
 	bool isblockedS;
 	bool isblockedA;
 	bool isblockedD;
+	
 	std::vector<AnimSet> animations;
+	std::vector<Entita*> entitiescollided;
 	Animator animpg;
 
 	std::string GetNome() {
@@ -78,15 +80,16 @@ public:
 
 	void CheckCollisions(SharedContext* context);
 	// è una funzione che mi serve a determinare se ci sono state collissioni e di che tipo
+	void CollisionEntity(Entita* ent, SharedContext* context);
 	void ResolveCollisions(SharedContext* context); // è una funzione che mi server per determinare cosa fare per le determinate collissioni, che decisioni prendere.
-
-	Entita(std::string nome, int forza, int vitalita, int livello, float velocita, sf::Vector2f pos, unsigned int id, SharedContext* context,std::string entityType) : entitytype(entityType), id(id), context(context), vitalita(vitalita), nome(nome), forza(forza), velocita(velocita), livello(livello), sprite(sf::Sprite()), isblockedA(false), isblockedD(false), isblockedS(false), isblockedW(false), animpg(sprite) {
+	void ResolveCollisionEntity(SharedContext* context);
+	Entita(std::string nome, int forza, int vitalita, int livello, float velocita, sf::Vector2f pos, unsigned int id, SharedContext* context, std::string entityType) : entitytype(entityType), id(id), context(context), vitalita(vitalita), nome(nome), forza(forza), velocita(velocita), livello(livello), sprite(sf::Sprite()), isblockedA(false), isblockedD(false), isblockedS(false), isblockedW(false), A(false),D(false),W(false),S(false),animpg(sprite) {
 		SetSizeRC(20, 26);
 		setSpawnPoint(pos);
 	}
 	virtual ~Entita() {}
 protected:
-	
+
 	void SetSizeRC(const float& x, const float& y) {
 		//funzione per settare la nuova area di collisione attorno all'entità
 		sizeRC = sf::Vector2f(x, y);
@@ -95,9 +98,9 @@ protected:
 	void updateCollRect() {
 		// è necessario aggiornare il rectColl, a causa del fatto che l'entità si muove.
 		// in altre parole cambierà position.x e position.y
-		rectColl = sf::FloatRect(position.x, position.y , sizeRC.x, sizeRC.y);
+		rectColl = sf::FloatRect(position.x, position.y, sizeRC.x, sizeRC.y);
 	}
-	
+
 
 	std::string nome;
 	int vitalita;
@@ -105,6 +108,11 @@ protected:
 	std::string entitytype;
 	int forza;
 	int livello;
+	bool W;
+	bool S;
+	bool A;
+	bool D;
+	// TODO salva mappa d'appartenenza.
 	sf::Vector2f position;
 	sf::Vector2f oldPosition;
 	sf::FloatRect rectColl;

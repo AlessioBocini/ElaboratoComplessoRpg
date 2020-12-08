@@ -19,7 +19,7 @@ public:
 	bool isDone();
 	bool isFullscreen();
 	bool isFocused();
-	
+
 	EventManager* GetEventManager();
 	sf::Vector2u GetwindowSize();
 	sf::RenderWindow* GetRenderWindow();

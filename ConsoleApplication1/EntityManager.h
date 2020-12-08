@@ -5,6 +5,7 @@
 #include "NemicoComune.h"
 #include "Miniboss.h"
 #include "Giocatore.h"
+#include "NPC.h"
 
 using EntityContainer = std::unordered_map<unsigned int, Entita*>;
 using EnemyTypes = std::unordered_map < std::string, std::string>;
@@ -21,18 +22,20 @@ public:
 	Entita* Find(unsigned int id);
 	Entita* Find(const std::string& name);
 	bool Remove(unsigned int id);
-	
-	void Setup();
+
+	void ConfigurePlayer();
 	void Update(const sf::Time& elapsed);
 	void Draw();
 	std::vector<Nemico*> getEntities();
+	std::vector<Npc*> getNpcs();
 	Giocatore* GetGiocatore();
 	void EraseAll();
 	SharedContext* GetContext();
-	
+
 
 private:
 	std::vector<Nemico*> entities;
+	std::vector<Npc*> vectorNpc;
 	Giocatore* player;
 	SharedContext* context;
 };

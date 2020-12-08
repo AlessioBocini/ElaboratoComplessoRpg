@@ -4,10 +4,11 @@
 #include "GameManager.h"
 #include "Mondo.h"
 
-EntityManager::EntityManager(SharedContext* context) :player(new Giocatore("alessio",sf::Vector2f(0,0))){
-	this->context = context;
+EntityManager::EntityManager(SharedContext* context) :player(new Giocatore("alessio", sf::Vector2f(0, 0))) , context(context){
+	
 }
-void EntityManager::Setup() {
+void EntityManager::ConfigurePlayer() {
+	
 	player->GetSprite().setTextureRect(sf::IntRect(0, 0, context->gameManager->spriteSize.x, context->gameManager->spriteSize.y));
 	auto& animationA = player->animpg.CreateAnimation("animationA", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
 	animationA.AddFrames(sf::Vector2i(0, context->gameManager->spriteSize.y), context->gameManager->spriteSize, 3);
@@ -31,9 +32,53 @@ Giocatore* EntityManager::GetGiocatore() {
 std::vector<Nemico*> EntityManager::getEntities() {
 	return entities;
 }
+std::vector<Npc*> EntityManager::getNpcs()
+{
+	return vectorNpc;
+}
 int EntityManager::Add(const EntityType& type, const std::string& name) {
 	std::string name1 = name;
 	sf::Vector2f pos = sf::Vector2f(5.0f, 2.0f);
+	std::string map = context->gameMap->GetPrevMap();
+	if (type == EntityType::Guard) {
+
+	}
+	if (type == EntityType::Shopkeeper) {
+		Npc* n = new Npc(name1, 0, 100, 1, 0.6f, pos, 3, context, "Shopkeeper");
+		auto& animationeShopkeeperA = n->animpg.CreateAnimation("animationeShopkeeperA", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+		animationeShopkeeperA.AddFrames(sf::Vector2i(context->gameManager->spriteSize.x * 3, context->gameManager->spriteSize.y), context->gameManager->spriteSize, 3);
+		n->animations.push_back(animationeShopkeeperA);
+
+		auto& animationeShopkeeperS = n->animpg.CreateAnimation("animationeShopkeeperS", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+		animationeShopkeeperS.AddFrames(sf::Vector2i(context->gameManager->spriteSize.x * 3, 0), context->gameManager->spriteSize, 3);
+		n->animations.push_back(animationeShopkeeperS);
+
+		auto& animationeShopkeeperD = n->animpg.CreateAnimation("animationeShopkeeperD", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+		animationeShopkeeperD.AddFrames(sf::Vector2i(context->gameManager->spriteSize.x * 3, context->gameManager->spriteSize.y * 2), context->gameManager->spriteSize, 3);
+		n->animations.push_back(animationeShopkeeperD);
+
+		auto& animationeShopkeeperW = n->animpg.CreateAnimation("animationeShopkeeperW", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+		animationeShopkeeperW.AddFrames(sf::Vector2i(context->gameManager->spriteSize.x * 3, context->gameManager->spriteSize.y * 3), context->gameManager->spriteSize, 3);
+		n->animations.push_back(animationeShopkeeperW);
+
+		auto& animationeShopkeeperIDLEW = n->animpg.CreateAnimation("animationeShopkeeperIDLEW", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+		animationeShopkeeperIDLEW.AddFrames(sf::Vector2i(context->gameManager->spriteSize.x * 4, context->gameManager->spriteSize.y * 3), context->gameManager->spriteSize, 1);
+		n->animations.push_back(animationeShopkeeperIDLEW);
+
+		auto& animationeShopkeeperIDLED = n->animpg.CreateAnimation("animationeShopkeeperIDLED", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+		animationeShopkeeperIDLED.AddFrames(sf::Vector2i(context->gameManager->spriteSize.x * 4, context->gameManager->spriteSize.y * 2), context->gameManager->spriteSize, 1);
+		n->animations.push_back(animationeShopkeeperIDLED);
+
+		auto& animationeShopkeeperIDLEA = n->animpg.CreateAnimation("animationeShopkeeperIDLEA", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+		animationeShopkeeperIDLEA.AddFrames(sf::Vector2i(context->gameManager->spriteSize.x * 4, context->gameManager->spriteSize.y), context->gameManager->spriteSize, 1);
+		n->animations.push_back(animationeShopkeeperIDLEA);
+
+		n->animpg.SwitchAnimation("animationeShopkeeperIDLEW");
+		n->setMap(map);
+		vectorNpc.push_back(n);
+	}
+
+
 	//TODO Miniboss
 	if (type == EntityType::Enemy) {
 		NemicoComune* n = new NemicoComune(name1, 0, 100, 1, 0.6f, pos, 2, context, "Nemico1");
@@ -57,23 +102,40 @@ int EntityManager::Add(const EntityType& type, const std::string& name) {
 		entities.push_back(n);
 	}
 	return 0;
-	
+
 }
+
 
 void EntityManager::Update(const sf::Time& dt) {
 	player->CheckCollisions(context);
-	player->ResolveCollisions(context);
 
 	for (auto i : entities) {
 		i->animpg.update(dt);
-		if(!i->isblockedD)
-			i->Movimento(i->GetVelocita(),0);
-		//check collissions mobs
+		if (!i->isblockedD)
+			i->Movimento((i->GetVelocita()), 0);
+
 		i->CheckCollisions(context);
+		i->CollisionEntity(player, context);
+		player->CollisionEntity(i, context);
+		for (auto k : entities) {
+			if (i == k)
+				continue;
+			i->CollisionEntity(k, context);
+		}		
+	}
+	for (auto i : vectorNpc) {
+		i->animpg.update(dt);
+	}
+	for (auto i : entities) {
 		i->ResolveCollisions(context);
 	}
-	
+	player->ResolveCollisions(context);
+
 	
 }
 
+void EntityManager::Draw() {
 
+
+	
+}

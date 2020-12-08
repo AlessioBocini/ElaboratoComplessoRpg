@@ -75,16 +75,16 @@ void Window::Draw(sf::Drawable& drawable) {
 	window.draw(drawable);
 }
 
-bool Window::isFocused() { 
-	return isfocused; 
+bool Window::isFocused() {
+	return isfocused;
 }
 void Window::ToggleFullscreen(EventDetails* l_details) {
 	isfullscreen = !isfullscreen;
 	window.close();
 	Create();
 }
-void Window::Close(EventDetails* l_details) { 
-	isdone = true; 
+void Window::Close(EventDetails* l_details) {
+	isdone = true;
 }
 sf::RenderWindow* Window::GetRenderWindow() { return &window; }
 EventManager* Window::GetEventManager() { return &eventManager; }

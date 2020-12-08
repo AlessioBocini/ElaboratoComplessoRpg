@@ -12,9 +12,9 @@ class GameManager;
 
 class Mondo {
 private:
-	TileId GetTileIdByCoords( int x,  int y);
+	TileId GetTileIdByCoords(int x, int y);
 	void LoadTiles(const std::string& path);
-	
+
 	void EraseTileSet();
 	SharedContext* context;
 	BaseState* currentState;
@@ -27,22 +27,23 @@ private:
 	sf::Vector2f playerStartPoint;
 	TileSet tileSet;
 	TileMap tileMap;
+	std::string lastMap;
+
 	int nTerritori;
 	std::vector<Territorio> territori;
-	std::string lastMap;
 public:
 	Mondo(SharedContext* context);
 	~Mondo();
 	void EraseMap();
 	std::string GetPrevMap();
 	void SetPrevMap(std::string previous_map);
-	Tile* GetTileByCoords( int x,  int y);
+	Tile* GetTileByCoords(int x, int y);
 	TileInfo* GetDefaultTile();
 	unsigned int GetTileSize() const;
 	const sf::Vector2u& GetMapSize() const;
 	const sf::Vector2f& GetPlayerStartpoint() const;
 	void SetPlayerStartpoint(const sf::Vector2f& newpos);
-	void LoadMap(const std::string& path,bool first);
+	void LoadMap(const std::string& path, bool first);
 	void Update(sf::Time const& dt);
 	void Draw();
 	int GetNTerritori() {

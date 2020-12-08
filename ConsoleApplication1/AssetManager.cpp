@@ -45,7 +45,7 @@ sf::SoundBuffer& AssetManager::GetSoundBuffer(std::string const& filename) {
 		catch (std::exception e) {
 			throw SoundBufferException("The SoundBuffer has failed to load");
 		}
-		
+
 		return sBuffer;
 	}
 }
@@ -64,7 +64,7 @@ sf::Font& AssetManager::GetFont(std::string const& filename) {
 		catch (std::exception e) {
 			throw FontException("Font not found");
 		}
-		
+
 		return sFont;
 	}
 }

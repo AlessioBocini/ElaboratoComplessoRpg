@@ -7,8 +7,8 @@ class StateManager; //faccio una forward declaration. inoltre il Base State non 
 class BaseState {
 	friend class StateManager;
 public:
-	BaseState(StateManager* stateManager) : stateManager(stateManager), transparent(false), transcendent(false){}
-	virtual ~BaseState(){}
+	BaseState(StateManager* stateManager) : stateManager(stateManager), transparent(false), transcendent(false) {}
+	virtual ~BaseState() {}
 
 	virtual void OnCreate() = 0;
 	virtual void OnDestroy() = 0;
@@ -17,7 +17,7 @@ public:
 
 	virtual void Update(const sf::Time& time) = 0;
 	virtual void Draw() = 0;
-	
+
 	void SetTransparent(const bool& isTrasparent) {
 		transparent = isTrasparent;
 	}

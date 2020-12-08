@@ -1,7 +1,7 @@
 
 #include "StateManager.h"
 #include "GameManager.h"
-State_Intro::State_Intro(StateManager* l_stateManager): BaseState(l_stateManager) {}
+State_Intro::State_Intro(StateManager* l_stateManager) : BaseState(l_stateManager) {}
 
 State_Intro::~State_Intro() {}
 
@@ -19,7 +19,7 @@ void State_Intro::OnCreate() {
 	text.setString("Premi spazio per continuare");
 	text.setCharacterSize(15);
 	sf::FloatRect textRect = text.getLocalBounds();
-	text.setOrigin(textRect.left + textRect.width / 2.0f,textRect.top+textRect.height/2.0f);
+	text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
 	text.setPosition(windowSize.x / 2.0f, windowSize.y / 2.0f);
 	EventManager* eventmanager = stateManager->GetContext()->eventManager;
 	eventmanager->AddCallback(StateType::Intro, "Intro_Continue", &State_Intro::Continue, this);

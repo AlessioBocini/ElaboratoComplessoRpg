@@ -9,7 +9,7 @@ State_Paused::State_Paused(StateManager* l_stateManager)
 State_Paused::~State_Paused() {}
 
 void State_Paused::OnCreate() {
-	
+
 	SetTransparent(true); // Set our transparency flag.
 	font.loadFromFile("arial.ttf");
 	text.setFont(font);

@@ -3,5 +3,5 @@
 class Territorio {
 
 public:
-	bool ShowMap();
+	bool DisplayTerritorio();
 };

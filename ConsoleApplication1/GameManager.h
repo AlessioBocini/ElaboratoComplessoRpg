@@ -8,17 +8,18 @@
 #include "Mondo.h"
 #include "EntityManager.h"
 
+
 class GameManager {
 
 public:
-	
+
 	sf::Vector2i spriteSize;
 	GameManager();
 	~GameManager();
 
 
 	void HandleInput();
-	void CommandConsole(); 
+	void CommandConsole();
 	void ApplyFormula();
 	void Update();
 	void LateUpdate();
@@ -30,21 +31,21 @@ public:
 
 	bool isButtonPressedSKill(std::string const& buttonPressed);
 	bool AggiungiSkill(Skill skill);
-	void SetInPauseGame(bool value); 
+	void SetInPauseGame(bool value);
 	bool isGamePaused();
 	bool isGameOver();
-	void SetPlayerStart(sf::Vector2f a );
+	void SetPlayerStart(sf::Vector2f a);
 	bool LoadGame();
 	bool SaveGame();
 	bool CheckForLevelUp();
 	void RegenStamina();
-	
+
 
 	void ToggleDebugMenu();
 	void DrawDebugMenu();
 
 	sf::Music* GetBackGroundMusic() { return &background_song; }
-	void SetBackGroundMusic(std::string const& filepath) { 
+	void SetBackGroundMusic(std::string const& filepath) {
 		background_song.openFromFile(filepath);
 	}
 
@@ -52,7 +53,7 @@ public:
 	void DrawEntities();
 private:
 	Window m_window;
-	
+
 	sf::Vector2f beginPlayerpos;
 	bool isPaused;
 

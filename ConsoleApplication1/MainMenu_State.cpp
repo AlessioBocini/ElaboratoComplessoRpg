@@ -1,10 +1,10 @@
 
 #include "StateManager.h"
 #include "GameManager.h"
-State_MainMenu::State_MainMenu(StateManager* l_stateManager) : BaseState(l_stateManager),buttonPadding(4){
+State_MainMenu::State_MainMenu(StateManager* l_stateManager) : BaseState(l_stateManager), buttonPadding(4) {
 
 }
-State_MainMenu::~State_MainMenu(){}
+State_MainMenu::~State_MainMenu() {}
 
 void State_MainMenu::OnCreate() {
 	stateManager->GetContext()->gameManager->SetInPauseGame(true);
@@ -15,11 +15,11 @@ void State_MainMenu::OnCreate() {
 	text.setCharacterSize(18);
 
 	sf::FloatRect textRect = text.getLocalBounds();
-	text.setOrigin(textRect.left + textRect.width / 2.0f,textRect.top+textRect.height/2.0f);
+	text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
 	text.setPosition(windowSize.x / 2.0f, 100);
 	//text.setPosition(400, 100);
 	buttonSize = sf::Vector2f(300.0f, 32.0f);
-	buttonPos = sf::Vector2f(windowSize.x/2, 200.0f);
+	buttonPos = sf::Vector2f(windowSize.x / 2, 200.0f);
 	buttonPadding = 4; //4px
 
 	std::string str[3];
@@ -29,7 +29,7 @@ void State_MainMenu::OnCreate() {
 
 	for (int i = 0; i < 3; ++i) {
 		sf::Vector2f buttonPosition(buttonPos.x, buttonPos.y +
-		(i * (buttonSize.y + buttonPadding)));
+			(i * (buttonSize.y + buttonPadding)));
 		rects[i].setSize(buttonSize);
 		rects[i].setFillColor(sf::Color::Red);
 
@@ -66,9 +66,9 @@ void State_MainMenu::Activate() {
 			rect.top + rect.height / 2.0f);
 	}
 }
-void State_MainMenu::Deactivate(){}
+void State_MainMenu::Deactivate() {}
 
-void State_MainMenu::Update(const sf::Time& l_time){}
+void State_MainMenu::Update(const sf::Time& l_time) {}
 
 
 void State_MainMenu::Draw() {

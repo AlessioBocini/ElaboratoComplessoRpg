@@ -11,5 +11,5 @@ public:
 	void SetVitalita(int const& vit) {
 		this->vitalita = vit;
 	}
-	Armatura(std::string nome, int vitalita) : vitalita(vitalita), Equipaggiamento(nome){}
+	Armatura(std::string nome, int vitalita) : vitalita(vitalita), Equipaggiamento(nome) {}
 };

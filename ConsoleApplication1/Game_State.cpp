@@ -1,7 +1,7 @@
 
 #include "StateManager.h"
 #include "GameManager.h"
-State_Game::State_Game(StateManager* l_stateManager) : BaseState(l_stateManager) , sprite(stateManager->GetContext()->entityManager->GetGiocatore()->GetSprite()){}
+State_Game::State_Game(StateManager* l_stateManager) : BaseState(l_stateManager), sprite(stateManager->GetContext()->entityManager->GetGiocatore()->GetSprite()) {}
 State_Game::~State_Game() {}
 
 void State_Game::OnCreate() {

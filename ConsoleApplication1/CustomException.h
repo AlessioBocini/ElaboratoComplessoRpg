@@ -1,5 +1,5 @@
 #ifndef Error_Manager
-	#define Error_Manager
+#define Error_Manager
 #include <exception>
 #include <string>
 class TextureException : public std::exception
@@ -56,7 +56,7 @@ public:
 };
 class ErrorManager {
 private:
-public: 
+public:
 };
 
 

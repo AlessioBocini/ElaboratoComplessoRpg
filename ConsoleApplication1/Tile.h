@@ -11,16 +11,16 @@ enum Sheet { Tile_Size = 32, Sheet_Width = 1366, Sheet_Height = 720 };
 using TileId = unsigned int;
 using AnimSet = Animator::Animation;
 struct TileInfo {
-	TileInfo(SharedContext* context, const std::string& texture = "",TileId id = 0) : context(context),id(0), texture(texture), anim(sprite), blocked(false), deadly(false) {
+	TileInfo(SharedContext* context, const std::string& texture = "", TileId id = 0) : context(context), id(0), texture(texture), anim(sprite), blocked(false), deadly(false) {
 
 		if (texture == "") {
 			this->id = id;
 			return;
 		}
-		
+
 		this->id = id;
-		sf::IntRect tileBoundaries(this->id % (Sheet::Sheet_Width/Sheet::Tile_Size)*Sheet::Tile_Size, this->id/(Sheet::Sheet_Height/Sheet::Tile_Size)*Sheet::Tile_Size,
-			Sheet::Tile_Size,Sheet::Tile_Size);
+		sf::IntRect tileBoundaries(this->id % (Sheet::Sheet_Width / Sheet::Tile_Size) * Sheet::Tile_Size, this->id / (Sheet::Sheet_Height / Sheet::Tile_Size) * Sheet::Tile_Size,
+			Sheet::Tile_Size, Sheet::Tile_Size);
 
 		sprite.setTextureRect(tileBoundaries);
 
@@ -38,7 +38,7 @@ struct TileInfo {
 	bool blocked;
 	std::string texture;
 	std::unique_ptr<SharedContext> context;
-
+	
 };
 
 struct Tile {
@@ -46,8 +46,9 @@ struct Tile {
 	TileInfo* properties;
 	bool teleport;
 	std::string nextMap;
-	Tile():teleport(false),properties(nullptr){}
+	sf::Vector2f teleportPos;
+	Tile() :teleport(false), properties(nullptr) {}
 	~Tile() {
-		
+
 	}
 };

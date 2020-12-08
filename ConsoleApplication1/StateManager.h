@@ -25,7 +25,7 @@ using StateFactory = std::unordered_map<StateType, std::function<BaseState* (voi
 
 
 class StateManager {
-public :
+public:
 
 	StateManager(SharedContext* shared, GameManager* gm);
 	~StateManager();
@@ -40,7 +40,7 @@ public :
 
 	void SwitchTo(const StateType& type);
 	void Remove(const StateType& type);
-	
+
 private:
 	void CreateState(const StateType& type);
 	void RemoveState(const StateType& type);

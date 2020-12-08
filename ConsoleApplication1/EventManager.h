@@ -23,14 +23,14 @@ enum class EventType {
 	MouseLeft = sf::Event::MouseLeft,
 	Closed = sf::Event::Closed,
 	TextEntered = sf::Event::TextEntered,
-	Keyboard = sf::Event::Count +1, Mouse , Joystick
+	Keyboard = sf::Event::Count + 1, Mouse, Joystick
 
 };
 
 struct EventInfo {
 	EventInfo() { code = 0; }
-	EventInfo(int cevent) : code(cevent){}
-	union {	
+	EventInfo(int cevent) : code(cevent) {}
+	union {
 		// uso una union perché magari in futuro potrebbe servirmi conoscere altre informazioni sugli eventi
 		// non solo il codice.
 		int code;
@@ -68,7 +68,7 @@ struct EventDetails {
 
 // struttura per poter mettere assieme le informazioni su un evento con i dettagli.
 struct Binding {
-	Binding(const std::string& name): name(name), details(name), cEvents(0){}
+	Binding(const std::string& name) : name(name), details(name), cEvents(0) {}
 	~Binding() {}
 	void BindEvent(EventType type, EventInfo info = EventInfo()) {
 		events.emplace_back(type, info);
@@ -100,7 +100,7 @@ public:
 	EventManager();
 	~EventManager();
 
-	bool AddBinding(Binding* binding);	
+	bool AddBinding(Binding* binding);
 	bool RemoveBinding(std::string name);
 	void SetFocus(const bool& focus);
 

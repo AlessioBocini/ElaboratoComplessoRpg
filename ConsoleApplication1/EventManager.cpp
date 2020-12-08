@@ -159,5 +159,4 @@ void EventManager::LoadBindings(){
 	}
 	_bindings.close();
 
-
 }

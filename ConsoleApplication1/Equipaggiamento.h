@@ -12,5 +12,5 @@ public:
 		this->nome = nome;
 	}
 
-	Equipaggiamento(std::string nome) : nome(nome){}
+	Equipaggiamento(std::string nome) : nome(nome) {}
 };

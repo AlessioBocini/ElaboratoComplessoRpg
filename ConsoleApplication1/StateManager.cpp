@@ -3,7 +3,7 @@
 
 
 
-StateManager::StateManager(SharedContext* shared, GameManager*gm) : shared(shared)  {
+StateManager::StateManager(SharedContext* shared, GameManager* gm) : shared(shared) {
 
 	RegisterState<State_Intro>(StateType::Intro); //lo stato State_Intro adesso ha una memoria allocata.
 	RegisterState<State_MainMenu>(StateType::MainMenu);
@@ -44,7 +44,7 @@ void StateManager::Draw() {
 	}
 }
 
-/* Uguale al draw, ma invece di controllare la trasparenza controllo la trascendenza, 
+/* Uguale al draw, ma invece di controllare la trasparenza controllo la trascendenza,
 che è la caratteristica di un oggetto di poter essere updatato oppure no */
 void StateManager::Update(const sf::Time& time) {
 	if (states.empty()) return;
@@ -108,19 +108,19 @@ void StateManager::SwitchTo(const StateType& type) {
 		// se trovo il tipo corrispondente
 		if (it->first == type) {
 			states.back().second->Deactivate(); // deattivo quello attuale
-			StateType tmp_type = it->first;  
+			StateType tmp_type = it->first;
 			BaseState* tmp_state = it->second;
 			states.erase(it); //elimino lo stato per poi inserirlo in fondo (per il calcolo successivo)
-			states.emplace_back(tmp_type, tmp_state); 
-			
+			states.emplace_back(tmp_type, tmp_state);
+
 			tmp_state->Activate(); //attivo il nuovo BaseState.
 			shared->wind->GetRenderWindow()->setView(tmp_state->GetView());
 			return;
 		}
 	}
-	
+
 	if (!states.empty()) {
-		states.back().second->Deactivate(); 
+		states.back().second->Deactivate();
 	}
 	//è necessario creare lo stato per inizializzare lo stato.
 	CreateState(type);
@@ -133,7 +133,7 @@ void StateManager::CreateState(const StateType& type) {
 	auto newState = stateFactory.find(type); //controllo se esiste uno stato registrato simile a questo inserito.
 	if (newState == stateFactory.end()) return;
 	BaseState* state = newState->second(); //assegno la memoria ritornata dalla funzione.
-	state->view = shared->wind->GetRenderWindow()->getDefaultView();	
+	state->view = shared->wind->GetRenderWindow()->getDefaultView();
 	states.emplace_back(type, state);
 	state->OnCreate(); //dipende dall'implementazione interna della funzione in ciascuno stato. (BaseState è astratta)
 }

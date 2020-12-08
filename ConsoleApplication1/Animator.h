@@ -1,6 +1,6 @@
 
 #ifndef ANIMATOR_H
-    #define ANIMATOR_H
+#define ANIMATOR_H
 
 
 
@@ -24,7 +24,7 @@ public:
         bool m_looping;
         Animation(std::string const& name, std::string const& textureName, sf::Time const& duration, bool looping)
             :m_Name(name), m_TextureName(textureName), m_duration(duration), m_looping(looping) {}
-        
+
         void AddFrames(sf::Vector2i const& startFrom, sf::Vector2i const& frameSize, unsigned int frames) {
             sf::Vector2i current = startFrom;
             for (unsigned int i = 0; i < frames; i++) {

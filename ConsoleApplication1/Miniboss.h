@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Nemico.h"
 class Miniboss : public Nemico {
 private:

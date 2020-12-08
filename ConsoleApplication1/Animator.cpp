@@ -14,13 +14,13 @@ Animator::Animation& Animator::CreateAnimation(std::string const& name, std::str
     return m_animations.back();
 }
 void Animator::SwitchAnimation(Animator::Animation* animation) {
-    
+
     try {
-      sf::Texture& texture = AssetManager::GetTexture(animation->m_TextureName);
-      if (animation != nullptr)
-        this->m_sprite.setTexture(texture); 
-    m_currentAnimation = animation;
-    m_currenttime = sf::Time::Zero;//resetta il tempo
+        sf::Texture& texture = AssetManager::GetTexture(animation->m_TextureName);
+        if (animation != nullptr)
+            this->m_sprite.setTexture(texture);
+        m_currentAnimation = animation;
+        m_currenttime = sf::Time::Zero;//resetta il tempo
     }
     catch (TextureException e) {
         std::cout << e.what() << std::endl;
@@ -36,13 +36,13 @@ bool Animator::SwitchAnimation(std::string const& name) {
 }
 Animator::Animation* Animator::FindAnimation(std::string const& name) {
     for (auto it = m_animations.begin(); it != m_animations.end(); it++) {
-        if (it->m_Name == name) 
+        if (it->m_Name == name)
             return &*it;
     }
     return nullptr;
 }
 std::string Animator::GetCurrentAnimationName() const {
-if (m_currentAnimation != nullptr) {
+    if (m_currentAnimation != nullptr) {
         return m_currentAnimation->m_Name;
     }
     return "";
