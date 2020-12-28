@@ -25,11 +25,14 @@ public:
         Animation(std::string const& name, std::string const& textureName, sf::Time const& duration, bool looping)
             :m_Name(name), m_TextureName(textureName), m_duration(duration), m_looping(looping) {}
 
-        void AddFrames(sf::Vector2i const& startFrom, sf::Vector2i const& frameSize, unsigned int frames) {
+        void AddFrames(sf::Vector2i const& startFrom, sf::Vector2i const& frameSize, unsigned int frames, bool vertical = false) {
             sf::Vector2i current = startFrom;
             for (unsigned int i = 0; i < frames; i++) {
                 m_frames.push_back(sf::IntRect(current.x, current.y, frameSize.x, frameSize.y));
-                current.x += frameSize.x;
+                if (!vertical)
+                    current.x += frameSize.x;
+                else
+                    current.y += frameSize.y;
             }
         }
     };
@@ -37,6 +40,8 @@ public:
     Animator::Animation& CreateAnimation(std::string const& name, std::string const& textureName, sf::Time const& duration, bool loop = false);
     void update(sf::Time const& dt);
     bool SwitchAnimation(std::string const& name);
+    int GetCurrentFrame();
+    int GetCurrentFrame(sf::Time const& dt);
     std::string GetCurrentAnimationName() const;
 private:
     Animator::Animation* FindAnimation(std::string const& name);

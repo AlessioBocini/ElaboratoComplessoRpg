@@ -52,6 +52,12 @@ void Animator::update(sf::Time const& dt) {
     if (m_currentAnimation == nullptr)
         return;
     m_currenttime += dt;
+    
+
+    m_sprite.setTextureRect(m_currentAnimation->m_frames[GetCurrentFrame(dt)]);
+}
+
+int Animator::GetCurrentFrame(sf::Time const& dt) {
     float scaledtime = (m_currenttime.asSeconds() / m_currentAnimation->m_duration.asSeconds());
     int numframes = m_currentAnimation->m_frames.size();
     int currentframe = static_cast<int>(scaledtime * numframes);
@@ -60,5 +66,8 @@ void Animator::update(sf::Time const& dt) {
     else if (currentframe >= numframes)//se è più grande 
         currentframe = numframes - 1;   //setta l'ultimo
 
-    m_sprite.setTextureRect(m_currentAnimation->m_frames[currentframe]);
+    return currentframe;
+}
+int Animator::GetCurrentFrame() {
+   return GetCurrentFrame(sf::Time::Zero);
 }
