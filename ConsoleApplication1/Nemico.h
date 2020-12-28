@@ -3,8 +3,21 @@
 #include "Giocatore.h"
 class Nemico : public Entita {
 public:
-	Nemico(std::string nome, int forza, int vitalita, int livello, float velocita, sf::Vector2f pos, unsigned int id, SharedContext* context, std::string entityType) : Entita(nome, forza, vitalita, livello, velocita, pos, id, context, entityType) {}
-	~Nemico() {}
-	void Attacco(bool isSkill) override;
-	void Movimento(float x, float y) override;
+	Nemico(const std::string &nome, const int &forza, const int &vitalita,const int &livello, const float &velocita, const sf::Vector2f &pos, unsigned int id, SharedContext& context, const std::string const& entityType) : Entita(nome, forza, vitalita, livello, velocita, pos, id, context, entityType),enemyType(-1) {}
+	Nemico(const std::string &nome, const int &forza, const int &vitalita,const int &livello, const float &velocita, const sf::Vector2f &pos, unsigned int id, SharedContext& context) : Nemico(nome, forza, vitalita, livello, velocita, pos, id, context, ""){}
+	~Nemico() override {}
+	bool Attacco(Entita*ent,int isSkill) override;
+	void Movimento(const float &x, const float &y) override;
+	void PreparaMovimento();
+	int GetEnemyType() {
+		return enemyType;
+	}
+	void SetEnemyType(const int &type) {
+		enemyType = type;
+	}
+	sf::Clock getClock();
+	
+private:
+	int enemyType;
+	sf::Clock clockDecisioneMovimento;
 };
