@@ -2,7 +2,6 @@
 #include <vector>
 #include "Entita.h"
 #include "SharedContext.h"
-#include "NemicoComune.h"
 #include "Miniboss.h"
 #include "Giocatore.h"
 #include "NPC.h"
@@ -14,28 +13,24 @@ using EntityFactory = std::unordered_map<EntityType, std::function<Entita* (void
 class EntityManager {
 public:
 
-	EntityManager(SharedContext* context);
+	EntityManager(SharedContext& context);
 	~EntityManager();
 
-	int Add(const EntityType& type, const std::string& name);
+	int Add(const EntityType& type, const std::string& name, const std::string & filepath, const int& details);
 	void SetSpawnPoint(unsigned int id, sf::Vector2i);
 	Entita* Find(unsigned int id);
-	Entita* Find(const std::string& name);
 	bool Remove(unsigned int id);
 
 	void ConfigurePlayer();
 	void Update(const sf::Time& elapsed);
 	void Draw();
-	std::vector<Nemico*> getEntities();
-	std::vector<Npc*> getNpcs();
+	std::vector<Entita*> getEntities();
 	Giocatore* GetGiocatore();
 	void EraseAll();
-	SharedContext* GetContext();
 
 
 private:
-	std::vector<Nemico*> entities;
-	std::vector<Npc*> vectorNpc;
-	Giocatore* player;
-	SharedContext* context;
+	std::vector<Entita*> entities;
+	Giocatore player;
+	SharedContext& context;
 };
