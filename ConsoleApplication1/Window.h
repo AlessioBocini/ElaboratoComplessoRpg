@@ -4,13 +4,12 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include "EventManager.h"
-
-
+struct SharedContext;
 class Window {
 public:
-	Window();
+	Window(SharedContext& context);
 	~Window();
-	Window(const std::string title, const sf::Vector2u& size, bool fullscreen);
+	Window(const std::string title, const sf::Vector2u& size, bool fullscreen, SharedContext& context);
 	void BeginDraw();
 	void EndDraw();
 
@@ -33,10 +32,11 @@ private:
 	bool isdone;
 	bool isfocused;
 	EventManager eventManager;
+	SharedContext& context;
 	std::string windowTitle;
 	sf::RenderWindow window;
 	sf::Vector2u windowSize;
 	void Create();
 	void Destroy();
-	void Setup(const std::string title, const sf::Vector2u& size, bool fullscreen);
+	
 };

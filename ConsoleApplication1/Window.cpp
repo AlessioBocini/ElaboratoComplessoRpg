@@ -1,13 +1,15 @@
 #include "Window.h"
 #include "Animator.h"
+#include "SharedContext.h"
 
-
-Window::Window()
+Window::Window(SharedContext& context) : Window("Window", sf::Vector2u(640, 480), false, context)
 {
-	Setup("Window", sf::Vector2u(640, 480), false);
 }
-Window::Window(const std::string title, const sf::Vector2u& size, bool fullscreen) {
-	Setup(title, size, fullscreen);
+Window::Window(const std::string title, const sf::Vector2u& size, bool fullscreen, SharedContext&context) : windowTitle(title),windowSize(size),isdone(false),isfocused(true), isfullscreen(fullscreen), context(context), eventManager(context) {
+	this->context.wind = this;
+	eventManager.AddCallback(StateType(0), "Fullscreen_toggle", &Window::ToggleFullscreen, this);
+	eventManager.AddCallback(StateType(0), "Window_close", &Window::Close, this);
+	Create();
 }
 Window::~Window() {
 	Destroy();
@@ -19,16 +21,7 @@ sf::FloatRect Window::GetViewSpace() {
 	sf::FloatRect viewSpace(viewCenter - viewSizeHalf, viewSize); // definisco il rettangolo visibile come centro-metà per largezza e size normale per altezza
 	return viewSpace;
 }
-void Window::Setup(const std::string title, const sf::Vector2u& size, bool fullscreen) {
-	windowTitle = title;
-	windowSize = size;
-	isfocused = true;
-	eventManager.AddCallback(StateType(0), "Fullscreen_toggle", &Window::ToggleFullscreen, this);
-	eventManager.AddCallback(StateType(0), "Window_close", &Window::Close, this);
-	isfullscreen = fullscreen;
-	isdone = false;
-	Create();
-}
+
 void Window::Create() {
 	auto style = (isfullscreen == true ? sf::Style::Fullscreen : sf::Style::Default);
 	window.create({ windowSize.x , windowSize.y, 32 }, windowTitle, style);
