@@ -22,6 +22,10 @@ bool GameManager::SaveGame() {
 void  GameManager::RegenStamina() {
 
 }
+sf::Vector2i GameManager::GetSpriteSize()
+{
+	return spriteSize;
+}
 bool GameManager::AggiungiSkill(Skill skill) {
 	return true;
 }
@@ -33,25 +37,20 @@ bool GameManager::isGamePaused() {
 void GameManager::SetInPauseGame(bool pause) {
 	isPaused = pause;
 }
-GameManager::GameManager() : m_window("rpg game", sf::Vector2u(1366, 720), false), world(&context), spriteSize(32, 32), entitymanager(&context), stateManager(&context, this), isPaused(false), isDebugMenuActive(false), isConcolePressed(false) {
-
-	auto player = entitymanager.GetGiocatore();
+GameManager::GameManager() : m_window("rpg game", sf::Vector2u(1366, 720), false, context), world(context), spriteSize(32, 32), entitymanager(context), stateManager(context, this), isPaused(false), isDebugMenuActive(false), isConcolePressed(false), assetmanager(context) {
+	context.gameManager = this;
+	Giocatore* player = entitymanager.GetGiocatore();
 	context.gameMap = &world;
 	context.wind = &m_window;
 	context.eventManager = m_window.GetEventManager();
-	context.gameManager = this;
 	context.assetManager = &assetmanager;
 	context.entityManager = &entitymanager;
 	stateManager.SwitchTo(StateType::Intro);
 	background_song.openFromFile("../assets/Music/Refrain.ogg");
 	textFormula.setFont(assetmanager.GetFont("arial.ttf"));
-	world.LoadMap("map1", true);
+	world.LoadMaps();
 	world.SetPrevMap("map1");
 	entitymanager.ConfigurePlayer();
-	player->setContext(&context);
-	player->setSpawnPoint(world.GetPlayerStartpoint());
-
-
 }
 GameManager::~GameManager() {}
 
@@ -63,18 +62,23 @@ void GameManager::Update() {
 	stateManager.Update(elapsed);
 
 	if (!isPaused) {
-		world.Update(elapsed);
+		world.getActualMap().Update(elapsed);
 		entitymanager.Update(elapsed);
 	}
 
 }
 
-void GameManager::SetPlayerStart(sf::Vector2f a) {
+void GameManager::SetPlayerStart(const sf::Vector2f& a) {
 	entitymanager.GetGiocatore()->setSpawnPoint(a);
 }
 
 void GameManager::HandleInput() {
-
+	/// <summary>
+	/// 
+	Giocatore* giocatore = entitymanager.GetGiocatore();
+	Arma* arma = giocatore->GetInventario()->GetWeapon();
+	Animator* animpg = giocatore->GetAnimpg();
+	/// </summary>
 	bool pressedkey = false;
 	sf::Event ev;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F1)) ToggleDebugMenu();
@@ -99,53 +103,99 @@ void GameManager::HandleInput() {
 	if (isConcolePressed) return;
 	if (isPaused) return;
 
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+		if (giocatore->GetInventario()->isInventoryVisibile()) {
+			giocatore->GetInventario()->InterazioneSlot();
+		}
+	}
 
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+		giocatore->PreparaAttacco(-1);
+	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-		if (entitymanager.GetGiocatore()->animpg.GetCurrentAnimationName() != "animationA")
-			entitymanager.GetGiocatore()->animpg.SwitchAnimation("animationA");
-		if (!entitymanager.GetGiocatore()->isblockedA) {
-			entitymanager.GetGiocatore()->Movimento(-1 * entitymanager.GetGiocatore()->GetVelocita(), 0);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) {
+		giocatore->ToggleInventory();
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
+		giocatore->PreparaInterazione();
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
+
+		arma->WeaponPosition('A');
+		if (!giocatore->isBlockedA()) {
+			if (animpg->GetCurrentAnimationName() != "animationA") {
+				animpg->SwitchAnimation("animationA");
+				arma->GetAnimpg()->SwitchAnimation("armaA");
+			}
+				
+		
+			giocatore->Movimento(-1 * giocatore->GetVelocita(), 0);
 
 		}
 
 		pressedkey = true;
-
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-		if (entitymanager.GetGiocatore()->animpg.GetCurrentAnimationName() != "animationD")
-			entitymanager.GetGiocatore()->animpg.SwitchAnimation("animationD");
-		if (!entitymanager.GetGiocatore()->isblockedD) {
-			entitymanager.GetGiocatore()->Movimento(entitymanager.GetGiocatore()->GetVelocita(), 0);
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
+		arma->WeaponPosition('D');
+		if (!giocatore->isBlockedD()) {
+			if (animpg->GetCurrentAnimationName() != "animationD") {
+				animpg->SwitchAnimation("animationD");
+				arma->GetAnimpg()->SwitchAnimation("armaD");
+			}
+				
+		
+			giocatore->Movimento(giocatore->GetVelocita(), 0);
 		}
 
 		pressedkey = true;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-		if (entitymanager.GetGiocatore()->animpg.GetCurrentAnimationName() != "animationW")
-			entitymanager.GetGiocatore()->animpg.SwitchAnimation("animationW");
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+		if (!giocatore->isBlockedW()) {
+			if (animpg->GetCurrentAnimationName() != "animationW")
+				animpg->SwitchAnimation("animationW");
 
-		if (!entitymanager.GetGiocatore()->isblockedW) {
-			entitymanager.GetGiocatore()->Movimento(0, -1 * entitymanager.GetGiocatore()->GetVelocita());
+		
+			giocatore->Movimento(0, -1 * giocatore->GetVelocita());
 		}
 
 		pressedkey = true;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-		if (entitymanager.GetGiocatore()->animpg.GetCurrentAnimationName() != "animationS")
-			entitymanager.GetGiocatore()->animpg.SwitchAnimation("animationS");
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+		if (!giocatore->isBlockedS()) {
+			if (animpg->GetCurrentAnimationName() != "animationS")
+				animpg->SwitchAnimation("animationS");
 
-		if (!entitymanager.GetGiocatore()->isblockedS) {
-			entitymanager.GetGiocatore()->Movimento(0, entitymanager.GetGiocatore()->GetVelocita());
+		
+			giocatore ->Movimento(0, giocatore->GetVelocita());
 		}
+
+		
+		
 
 		pressedkey = true;
 
 	}
-
-	if (pressedkey) {
-		entitymanager.GetGiocatore()->animpg.update(elapsed);
+	if (!pressedkey) {
+		
+		if (animpg->GetCurrentAnimationName() == "animationA") {
+			animpg->SwitchAnimation("animationIDLEA");
+			arma->Reset("armaIDLEA");
+		}
+		else if (animpg->GetCurrentAnimationName() == "animationD") {
+			animpg->SwitchAnimation("animationIDLED");
+			arma->Reset("armaIDLED");
+		}
+		else if (animpg->GetCurrentAnimationName() == "animationS") {
+			animpg->SwitchAnimation("animationIDLES");
+		}
+		else if (animpg->GetCurrentAnimationName() == "animationW") {
+			animpg->SwitchAnimation("animationIDLEW");
+		}
 	}
+	giocatore->Update(elapsed);
+	
 
 }
 
@@ -160,7 +210,7 @@ void GameManager::ApplyFormula() {
 		int k = 0;
 		std::string x = "";
 		std::string y = "";
-		for (int i = 9; i < consoleFormula.length(); i++) {
+		for (unsigned int i = 9; i < consoleFormula.length(); i++) {
 			while(i< consoleFormula.length() && consoleFormula[i] != ' ') {
 				if (k == 0) {
 					x += consoleFormula[i];
@@ -186,7 +236,7 @@ void GameManager::ApplyFormula() {
 		}
 		else if (consoleFormula.length() > 7 && consoleFormula.substr(6, 5) == "enemy") {
 			std::cout << "- nemico comune" << std::endl;
-			entitymanager.Add(EntityType::Enemy, "nemico1");
+			entitymanager.Add(EntityType::Enemy, "Scheletro", world.getActualMap().GetCurrentTerritory(),int(EnemyType::Skeleton));
 		}
 		else if (consoleFormula.length() > 7 && consoleFormula.substr(6, 8) == "miniboss") {
 			std::cout << "- miniboss" << std::endl;
@@ -196,8 +246,8 @@ void GameManager::ApplyFormula() {
 void GameManager::CommandConsole() {
 	sf::Event ev;
 	if (isConcolePressed) {
-
-		while (m_window.GetRenderWindow()->pollEvent(ev)) {
+		sf::RenderWindow* renderwindow = m_window.GetRenderWindow();
+		while (renderwindow->pollEvent(ev)) {
 			if (ev.type == sf::Event::TextEntered) {
 				if (ev.text.unicode == 8) {
 					if (consoleFormula.length() != 0)
@@ -250,6 +300,7 @@ void GameManager::LateUpdate() {
 void GameManager::DrawDebugMenu() {
 	if (!isDebugMenuActive) return;
 
+
 	sf::RectangleShape debugmenu = sf::RectangleShape(sf::Vector2f(700, 110));
 	debugmenu.setPosition(m_window.GetViewSpace().left, m_window.GetViewSpace().top + m_window.GetViewSpace().height * 0.75f);
 	debugmenu.setOutlineColor(sf::Color::Yellow);
@@ -277,45 +328,12 @@ void GameManager::DrawDebugMenu() {
 }
 
 
+
 void GameManager::DrawEntities() {
 
 	float nametextweight = 0.5, infoweight = 0.25;
-	auto player = entitymanager.GetGiocatore();
-	m_window.Draw(player->GetSprite());
-	sf::Text name(player->GetNome(), assetmanager.GetFont("arial.ttf"));
-	sf::Text level("[" + std::to_string(player->GetLivello()) + "]", assetmanager.GetFont("arial.ttf"));
-	sf::Text vitalita("HP: " + std::to_string(player->GetVitalita()) + "%", assetmanager.GetFont("arial.ttf"));
-	sf::Text stamina("SP: " + std::to_string(player->GetStamina()) + "%", assetmanager.GetFont("arial.ttf"));
-	sf::Text coords("x : " + std::to_string(player->GetPosition().x/32) + "\ny : " + std::to_string(player->GetPosition().y/32), assetmanager.GetFont("arial.ttf"));
+	Giocatore* player = entitymanager.GetGiocatore();
 	
-	name.setScale(nametextweight, nametextweight);
-	name.setOutlineColor(sf::Color::Black);
-	name.setOutlineThickness(1);
-	level.setScale(nametextweight, nametextweight);
-	level.setOutlineColor(sf::Color::Black);
-	level.setOutlineThickness(1);
-	stamina.setScale(infoweight, infoweight);
-	stamina.setOutlineColor(sf::Color::Black);
-	stamina.setOutlineThickness(0.25);
-	vitalita.setScale(infoweight, infoweight);
-	vitalita.setOutlineColor(sf::Color::Black);
-	vitalita.setOutlineThickness(0.25);
-	coords.setScale(nametextweight, nametextweight);
-	coords.setFillColor(sf::Color::Red);
-	
-	
-
-	coords.setPosition(m_window.GetViewSpace().left,m_window.GetViewSpace().top);
-	name.setPosition(player->GetPosition().x - (player->GetSprite().getGlobalBounds().width) / 4 - 15, player->GetPosition().y - player->GetSprite().getGlobalBounds().height);
-	vitalita.setPosition(player->GetPosition().x - (player->GetSprite().getGlobalBounds().width) / 4 - 15, player->GetPosition().y - player->GetSprite().getGlobalBounds().height / 3);
-	stamina.setPosition(player->GetPosition().x + (player->GetSprite().getGlobalBounds().width) - 1 / 4 - 15, player->GetPosition().y - player->GetSprite().getGlobalBounds().height / 3);
-	level.setPosition(player->GetPosition().x + 1.4f * (player->GetSprite().getGlobalBounds().width) - 15, player->GetPosition().y - player->GetSprite().getGlobalBounds().height);
-	
-	m_window.Draw(name);
-	m_window.Draw(level);
-	m_window.Draw(vitalita);
-	m_window.Draw(stamina);
-	m_window.Draw(coords);
 	
 	if (world.GetPrevMap() == "map1") {
 
@@ -325,19 +343,18 @@ void GameManager::DrawEntities() {
 		ShopTag.setOutlineThickness(1);
 		ShopTag.setPosition(10.25 * 32, 8.75 * 32);
 		m_window.Draw(ShopTag);
+		sf::Text GuildTag("GUILD", assetmanager.GetFont("arial.ttf"));
+		GuildTag.setScale(nametextweight * 2, nametextweight * 2);
+		GuildTag.setOutlineColor(sf::Color::Black);
+		GuildTag.setOutlineThickness(1);
+		GuildTag.setPosition(15.05f * 32.f, 8.75f * 32.f);
+		m_window.Draw(GuildTag);
 	}
-	// MOCK MOVEMENT FOR Enemies
-	for (auto i : entitymanager.getEntities()) {
-		m_window.Draw(i->GetSprite());
-
-		auto* ps = dynamic_cast<Miniboss*>(i);
-		if (!(ps == nullptr)) {
-			std::cout << "i'm a boss" << std::endl;
-		}
-	}
-
-	for (auto i : entitymanager.getNpcs()) {
-		if(i->getMap() == context.gameMap->GetPrevMap())
-			m_window.Draw(i->GetSprite());
-	}
+	
+	entitymanager.Draw();
+}
+void GameManager::SetMaxFramerate(float limit) {
+	sf::RenderWindow* renderWindow = m_window.GetRenderWindow();
+	renderWindow->setFramerateLimit(limit);
+	renderWindow->setVerticalSyncEnabled(true);
 }

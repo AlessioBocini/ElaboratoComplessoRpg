@@ -7,13 +7,13 @@
 #include "StateManager.h"
 #include "Mondo.h"
 #include "EntityManager.h"
-
+#include "Window.h"
 
 class GameManager {
 
 public:
 
-	sf::Vector2i spriteSize;
+	
 	GameManager();
 	~GameManager();
 
@@ -28,18 +28,17 @@ public:
 	sf::Time GetElapsed();
 	void RestartClock();
 
-
 	bool isButtonPressedSKill(std::string const& buttonPressed);
 	bool AggiungiSkill(Skill skill);
 	void SetInPauseGame(bool value);
 	bool isGamePaused();
 	bool isGameOver();
-	void SetPlayerStart(sf::Vector2f a);
+	void SetPlayerStart(const sf::Vector2f &a);
 	bool LoadGame();
 	bool SaveGame();
 	bool CheckForLevelUp();
 	void RegenStamina();
-
+	sf::Vector2i GetSpriteSize();
 
 	void ToggleDebugMenu();
 	void DrawDebugMenu();
@@ -51,12 +50,13 @@ public:
 
 
 	void DrawEntities();
+	void SetMaxFramerate(float limit);
 private:
 	Window m_window;
 
 	sf::Vector2f beginPlayerpos;
 	bool isPaused;
-
+	sf::Vector2i spriteSize;
 	bool isDebugMenuActive;
 	bool isConcolePressed;
 	std::string consoleFormula;
@@ -71,5 +71,6 @@ private:
 	Mondo world;
 	sf::Clock clock;
 	sf::Time elapsed;
+
 
 };
