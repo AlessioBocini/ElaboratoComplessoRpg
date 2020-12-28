@@ -5,10 +5,11 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <map>
-
+struct SharedContext;
 class AssetManager {
 public:
-	AssetManager();
+	AssetManager(SharedContext &context);
+	~AssetManager() {}
 	static sf::Texture& GetTexture(std::string const& filename);
 	static sf::SoundBuffer& GetSoundBuffer(std::string const& filename);
 	static sf::Font& GetFont(std::string const& filename);
@@ -20,6 +21,6 @@ private:
 	std::map<std::string, sf::Font> m_fonts;
 	std::map<std::string, std::unique_ptr<sf::Shader>>m_shaders;
 	static AssetManager* sInstance;//contiene il puntatore all'unica istanza del manager
-
+	SharedContext& context;
 };
 #endif

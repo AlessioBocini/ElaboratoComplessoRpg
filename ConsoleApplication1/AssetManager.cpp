@@ -1,10 +1,11 @@
 #include <assert.h>
 #include "AssetManager.h"
 #include "CustomException.h"
-
+#include "SharedContext.h"
 AssetManager* AssetManager::sInstance = nullptr;
 
-AssetManager::AssetManager() {
+AssetManager::AssetManager(SharedContext& context) : context(context) {
+	this->context.assetManager = this;
 	assert(sInstance == nullptr);
 	sInstance = this;
 }
