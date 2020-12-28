@@ -27,7 +27,7 @@ using StateFactory = std::unordered_map<StateType, std::function<BaseState* (voi
 class StateManager {
 public:
 
-	StateManager(SharedContext* shared, GameManager* gm);
+	StateManager(SharedContext& shared, GameManager* gm);
 	~StateManager();
 
 	void Update(const sf::Time& time);
@@ -53,7 +53,7 @@ private:
 			return new T(this);
 		};
 	}
-	SharedContext* shared;
+	SharedContext& shared;
 	StateContainer states;
 	StateFactory stateFactory;
 	TypeContainer toRemove;

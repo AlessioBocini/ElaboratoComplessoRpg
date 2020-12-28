@@ -3,7 +3,7 @@
 
 
 
-StateManager::StateManager(SharedContext* shared, GameManager* gm) : shared(shared) {
+StateManager::StateManager(SharedContext& shared, GameManager* gm) : shared(shared) {
 
 	RegisterState<State_Intro>(StateType::Intro); //lo stato State_Intro adesso ha una memoria allocata.
 	RegisterState<State_MainMenu>(StateType::MainMenu);
@@ -35,7 +35,7 @@ void StateManager::Draw() {
 			--it;
 		}
 		for (; it != states.end(); ++it) {
-			shared->wind->GetRenderWindow()->setView(it->second->GetView());
+			shared.wind->GetRenderWindow()->setView(it->second->GetView());
 			it->second->Draw(); //disegna il primo BaseState non trasparente
 		}
 	}
@@ -68,11 +68,8 @@ void StateManager::Update(const sf::Time& time) {
 }
 
 SharedContext* StateManager::GetContext() {
-	return shared;
+	return &shared;
 }
-/*GameManager* StateManager::GetGameManager() {
-	return gamemanager;
-}*/
 
 /*controllo tra tutti gli stati se esiste un dato stato in input, controlla se è presente nello stack toRemove.
  in caso affermativo ritorna true altrimenti falso.*/
@@ -103,7 +100,7 @@ void StateManager::ProcessRequests() {
 }
 
 void StateManager::SwitchTo(const StateType& type) {
-	shared->eventManager->SetCurrentState(type);	// setto il nuovo stato
+	shared.eventManager->SetCurrentState(type);	// setto il nuovo stato
 	for (auto it = states.begin(); it != states.end(); it++) {
 		// se trovo il tipo corrispondente
 		if (it->first == type) {
@@ -114,7 +111,7 @@ void StateManager::SwitchTo(const StateType& type) {
 			states.emplace_back(tmp_type, tmp_state);
 
 			tmp_state->Activate(); //attivo il nuovo BaseState.
-			shared->wind->GetRenderWindow()->setView(tmp_state->GetView());
+			shared.wind->GetRenderWindow()->setView(tmp_state->GetView());
 			return;
 		}
 	}
@@ -126,14 +123,14 @@ void StateManager::SwitchTo(const StateType& type) {
 	CreateState(type);
 	states.back().second->Activate();
 	states.back().second->Activate();
-	shared->wind->GetRenderWindow()->setView(states.back().second->GetView());
+	shared.wind->GetRenderWindow()->setView(states.back().second->GetView());
 }
 
 void StateManager::CreateState(const StateType& type) {
 	auto newState = stateFactory.find(type); //controllo se esiste uno stato registrato simile a questo inserito.
 	if (newState == stateFactory.end()) return;
 	BaseState* state = newState->second(); //assegno la memoria ritornata dalla funzione.
-	state->view = shared->wind->GetRenderWindow()->getDefaultView();
+	state->view = shared.wind->GetRenderWindow()->getDefaultView();
 	states.emplace_back(type, state);
 	state->OnCreate(); //dipende dall'implementazione interna della funzione in ciascuno stato. (BaseState è astratta)
 }

@@ -40,12 +40,11 @@ void State_Game::Update(const sf::Time& time) {
 		view.setCenter(viewSpace.width / 2, view.getCenter().y);
 		context->wind->GetRenderWindow()->setView(view);
 	}
-	else if (viewSpace.left + viewSpace.width > (context->gameMap->GetMapSize().x + 1) * Sheet::Tile_Size) {
-		view.setCenter(((context->gameMap->GetMapSize().x + 1) * Sheet::Tile_Size) - (viewSpace.width / 2), view.getCenter().y);
+	else if (viewSpace.left + viewSpace.width > (context->gameMap->getActualMap().GetMapSize().x + 1) * Sheet::Tile_Size) {
+		view.setCenter(((context->gameMap->getActualMap().GetMapSize().x + 1) * Sheet::Tile_Size) - (viewSpace.width / 2), view.getCenter().y);
 		context->wind->GetRenderWindow()->setView(view);
 	}
 
-	//context->gameMap->Update(time);
 }
 
 //il giocatore dovrà essere mostrato solo ed esclusivamente durante lo stato di gioco.
