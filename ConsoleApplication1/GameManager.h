@@ -25,20 +25,22 @@ public:
 	void LateUpdate();
 	void Render();
 	Window* getWindow();
-	sf::Time GetElapsed();
+	sf::Time GetElapsed() const;
 	void RestartClock();
 
-	bool isButtonPressedSKill(std::string const& buttonPressed);
+
+	bool isButtonPressedSKill(std::string const& buttonPressed) const;
 	bool AggiungiSkill(Skill skill);
 	void SetInPauseGame(bool value);
-	bool isGamePaused();
-	bool isGameOver();
+	void SetGameOverGame(bool value);
+	bool isGamePaused() const;
+	bool isGameOver() const;
 	void SetPlayerStart(const sf::Vector2f &a);
 	bool LoadGame();
 	bool SaveGame();
 	bool CheckForLevelUp();
 	void RegenStamina();
-	sf::Vector2i GetSpriteSize();
+	sf::Vector2i GetSpriteSize() const;
 
 	void ToggleDebugMenu();
 	void DrawDebugMenu();
@@ -56,6 +58,7 @@ private:
 
 	sf::Vector2f beginPlayerpos;
 	bool isPaused;
+	bool GameOver;
 	sf::Vector2i spriteSize;
 	bool isDebugMenuActive;
 	bool isConcolePressed;
@@ -71,6 +74,7 @@ private:
 	Mondo world;
 	sf::Clock clock;
 	sf::Time elapsed;
-
+	//Debug modes
+	bool godmode = false;
 
 };

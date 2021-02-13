@@ -7,11 +7,11 @@ bool GameManager::CheckForLevelUp() {
 
 	return true;
 }
-bool GameManager::isButtonPressedSKill(std::string const& buttonPressed) {
+bool GameManager::isButtonPressedSKill(std::string const& buttonPressed) const{
 	return true;
 }
-bool GameManager::isGameOver() {
-	return false;
+bool GameManager::isGameOver() const {
+	return GameOver;
 }
 bool GameManager::LoadGame() {
 	return true;
@@ -22,7 +22,7 @@ bool GameManager::SaveGame() {
 void  GameManager::RegenStamina() {
 
 }
-sf::Vector2i GameManager::GetSpriteSize()
+sf::Vector2i GameManager::GetSpriteSize() const
 {
 	return spriteSize;
 }
@@ -30,14 +30,18 @@ bool GameManager::AggiungiSkill(Skill skill) {
 	return true;
 }
 
-bool GameManager::isGamePaused() {
+bool GameManager::isGamePaused() const{
 	return isPaused;
 }
 
 void GameManager::SetInPauseGame(bool pause) {
 	isPaused = pause;
 }
-GameManager::GameManager() : m_window("rpg game", sf::Vector2u(1366, 720), false, context), world(context), spriteSize(32, 32), entitymanager(context), stateManager(context, this), isPaused(false), isDebugMenuActive(false), isConcolePressed(false), assetmanager(context) {
+void GameManager::SetGameOverGame(bool value)
+{
+	GameOver = value;
+}
+GameManager::GameManager() : m_window("rpg game", sf::Vector2u(1366, 720), false, context), world(context), spriteSize(32, 32), entitymanager(context), stateManager(context, this), isPaused(false), GameOver(false), isDebugMenuActive(false), isConcolePressed(false), assetmanager(context) {
 	context.gameManager = this;
 	Giocatore* player = entitymanager.GetGiocatore();
 	context.gameMap = &world;
@@ -52,8 +56,8 @@ GameManager::GameManager() : m_window("rpg game", sf::Vector2u(1366, 720), false
 	world.SetPrevMap("map1");
 	entitymanager.ConfigurePlayer();
 }
-GameManager::~GameManager() {}
 
+GameManager::~GameManager() {}
 
 void GameManager::Update() {
 
@@ -78,6 +82,8 @@ void GameManager::HandleInput() {
 	Giocatore* giocatore = entitymanager.GetGiocatore();
 	Arma* arma = giocatore->GetInventario()->GetWeapon();
 	Animator* animpg = giocatore->GetAnimpg();
+	float speed = giocatore->GetVelocita();
+	giocatore->SetRunning(false);
 	/// </summary>
 	bool pressedkey = false;
 	sf::Event ev;
@@ -102,7 +108,16 @@ void GameManager::HandleInput() {
 
 	if (isConcolePressed) return;
 	if (isPaused) return;
+	
+	if (!giocatore->isAlive()) {
 
+		giocatore->Update(elapsed);
+		if(giocatore->GetAnimpg()->GetCurrentFrame() == 3)
+			context.gameManager->SetGameOverGame(true);
+		return;
+	}
+
+	
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 		if (giocatore->GetInventario()->isInventoryVisibile()) {
 			giocatore->GetInventario()->InterazioneSlot();
@@ -110,7 +125,7 @@ void GameManager::HandleInput() {
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
-		giocatore->PreparaAttacco(-1);
+		giocatore->PreparaAttacco();
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) {
@@ -121,58 +136,71 @@ void GameManager::HandleInput() {
 		giocatore->PreparaInterazione();
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
 
-		arma->WeaponPosition('A');
+		if (giocatore->GetStamina() != 0) {
+			giocatore->SetRunning(true);
+			speed *= 1.5;
+		}
+		else {
+			giocatore->SetRunning(false);
+		}
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
+		
+		if(arma != nullptr)
+			arma->WeaponPosition('A');
 		if (!giocatore->isBlockedA()) {
 			if (animpg->GetCurrentAnimationName() != "animationA") {
 				animpg->SwitchAnimation("animationA");
-				arma->GetAnimpg()->SwitchAnimation("armaA");
+				if(arma != nullptr)
+					arma->GetAnimpg()->SwitchAnimation("armaA");
 			}
-				
 		
-			giocatore->Movimento(-1 * giocatore->GetVelocita(), 0);
+			giocatore->Movimento(-1 * speed, 0);
 
 		}
 
 		pressedkey = true;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-		arma->WeaponPosition('D');
+		if (arma != nullptr)
+			arma->WeaponPosition('D');
 		if (!giocatore->isBlockedD()) {
 			if (animpg->GetCurrentAnimationName() != "animationD") {
 				animpg->SwitchAnimation("animationD");
-				arma->GetAnimpg()->SwitchAnimation("armaD");
+				if (arma != nullptr)
+					arma->GetAnimpg()->SwitchAnimation("armaD");
 			}
-				
 		
-			giocatore->Movimento(giocatore->GetVelocita(), 0);
+			giocatore->Movimento(speed, 0);
 		}
 
 		pressedkey = true;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 		if (!giocatore->isBlockedW()) {
-			if (animpg->GetCurrentAnimationName() != "animationW")
+			if (animpg->GetCurrentAnimationName() != "animationW") {
 				animpg->SwitchAnimation("animationW");
-
+				if (arma != nullptr)
+					arma->GetAnimpg()->SwitchAnimation("armaW");
+			}
 		
-			giocatore->Movimento(0, -1 * giocatore->GetVelocita());
+			giocatore->Movimento(0, -1 * speed);
 		}
 
 		pressedkey = true;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
 		if (!giocatore->isBlockedS()) {
-			if (animpg->GetCurrentAnimationName() != "animationS")
+			if (animpg->GetCurrentAnimationName() != "animationS")	{
 				animpg->SwitchAnimation("animationS");
-
+				if (arma != nullptr)
+					arma->GetAnimpg()->SwitchAnimation("armaS");
+			}
 		
-			giocatore ->Movimento(0, giocatore->GetVelocita());
+			giocatore ->Movimento(0, speed);
 		}
-
-		
-		
 
 		pressedkey = true;
 
@@ -181,11 +209,13 @@ void GameManager::HandleInput() {
 		
 		if (animpg->GetCurrentAnimationName() == "animationA") {
 			animpg->SwitchAnimation("animationIDLEA");
-			arma->Reset("armaIDLEA");
+			if (arma != nullptr)
+				arma->Reset("armaIDLEA");
 		}
 		else if (animpg->GetCurrentAnimationName() == "animationD") {
 			animpg->SwitchAnimation("animationIDLED");
-			arma->Reset("armaIDLED");
+			if (arma != nullptr)
+				arma->Reset("armaIDLED");
 		}
 		else if (animpg->GetCurrentAnimationName() == "animationS") {
 			animpg->SwitchAnimation("animationIDLES");
@@ -205,6 +235,22 @@ void GameManager::ApplyFormula() {
 
 	if (consoleFormula.substr(0, 8) == "shutdown") {
 		std::cout << "il gioco si chiude" << std::endl;
+	}
+	if (consoleFormula.substr(0, 7) == "godmode") {
+		auto giocatore = context.entityManager->GetGiocatore();
+		if (!godmode) {
+			std::cout << "god mode enabled" << std::endl;
+			
+			giocatore->SetVitalita(80000);
+			giocatore->SetStamina(80000);
+		}
+		else {
+			std::cout << "god mode disabled" << std::endl;
+
+			giocatore->SetVitalita(giocatore->GetMaxVitalita());
+		}
+		godmode = !(godmode);
+
 	}
 	else if (consoleFormula.substr(0, 8) == "teleport") {
 		int k = 0;
@@ -285,7 +331,7 @@ Window* GameManager::getWindow() {
 	return &(this->m_window);
 }
 
-sf::Time GameManager::GetElapsed() {
+sf::Time GameManager::GetElapsed() const {
 	return elapsed;
 }
 void GameManager::RestartClock() {
