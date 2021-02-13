@@ -15,52 +15,58 @@ class Entita {
 public:
 	virtual void Movimento(const float &x, const float &y) = 0;
 	virtual bool Attacco(Entita* ent, int isSkill) = 0;
-	void PreparaAttacco(int isSkill);
+	void PreparaAttacco(int isSkill = -1);
 	void PreparaInterazione();
+	void Hit(int forza);
+
+	bool isBlockedW() const;
+	bool isBlockedS() const;
+	bool isBlockedA() const;
+	bool isBlockedD() const;
+	bool isAlive() const;
 	
-	bool isBlockedW();
-	bool isBlockedS();
-	bool isBlockedA();
-	bool isBlockedD();
 
 	void Update(sf::Time const& dt);
 	std::string GetNome();
 	void SetNome(std::string newnome);
-	int GetVitalita();
+	int GetVitalita() const;
 	void SetVitalita(int vit);
-	int GetMaxVitalita();
+	int GetMaxVitalita() const;
 	void SetMaxVitalita(int vit);
-	float  GetVelocita();
+	float  GetVelocita() const;
 	void SetVelocita(float vel);
-	int GetForza();
+	int GetForza() const;
 	void SetForza(int const& forza);
-	int GetLivello();
+	int GetLivello() const;
 	void SetLivello(int const& liv);
 	Animator* GetAnimpg();
-	std::vector<AnimSet> GetAnimations();
+	std::vector<AnimSet> GetAnimations() const;
 	Inventario* GetInventario();
 	void SetLastDirection(char newDirection);
-	char GetLastDirection();
-	sf::Vector2f GetPosition();
+	char GetLastDirection() const;
+	sf::Vector2f GetPosition() const;
 	void SetPosition(const sf::Vector2f const& newpos);
 	sf::Sprite& GetSprite();
 	void SetSprite(sf::Sprite sprite);
-	sf::FloatRect GetCollRect();
+	sf::FloatRect GetCollRect() const;
 	void setContext(SharedContext& context);
-	unsigned int GetId();
+	unsigned int GetId() const;
 	void setId(unsigned int id1);
 	void SetEntityType(const std::string& newType);
-	std::string GetEntityType();
+	std::string GetEntityType() const;
 	void setSpawnPoint(sf::Vector2f pos);
 	void setMap(const std::string& map);
-	std::string getMap();
+	std::string getMap() const;
+	const int getDespawnTime() const;
+	sf::Clock getDespawnClock() const;
+	void Respawn();
 
-	void CheckCollisions(/*SharedContext& context*/);
+	void CheckCollisions();
 	// è una funzione che mi serve a determinare se ci sono state collissioni e di che tipo
-	void CollisionEntity(Entita* ent/*, SharedContext* context*/);
-	void ResolveCollisions(/*SharedContext* context*/); // è una funzione che mi server per determinare cosa fare per le determinate collissioni, che decisioni prendere.
-	void ResolveCollisionEntity(/*SharedContext* context*/);
-	Entita(const std::string &nome, const int &forza, const int &vitalita, const int &livello, const float &velocita, const sf::Vector2f &pos, unsigned int id, SharedContext& context, const std::string const &entityType) : entitytype(entityType), id(id), context(context), vitalita(vitalita),maxvitalita(vitalita), nome(nome), forza(forza), velocita(velocita), livello(livello), sprite(sf::Sprite()), isblockedA(false), isblockedD(false), isblockedS(false), isblockedW(false), A(false),D(false),W(false),S(false),Attacking(false),Interacting(false), lastDirection('S'),animpg(sprite),sizeRC(sf::Vector2f(20,26)), inventario(context) {
+	void CollisionEntity(Entita* ent);
+	void ResolveCollisions(); // è una funzione che mi server per determinare cosa fare per le determinate collissioni, che decisioni prendere.
+	void ResolveCollisionEntity();
+	Entita(const std::string &nome, const int &forza, const int &vitalita, const int &livello, const float &velocita, const sf::Vector2f &pos, unsigned int id, SharedContext& context, const std::string const &entityType) : entitytype(entityType), id(id), context(context), vitalita(vitalita),maxvitalita(vitalita), nome(nome), forza(forza), velocita(velocita), livello(livello), sprite(sf::Sprite()), isblockedA(false), isblockedD(false), isblockedS(false), isblockedW(false), A(false),D(false),W(false),S(false),Attacking(false),Interacting(false), isalive(true), lastDirection('S'),animpg(sprite),sizeRC(sf::Vector2f(25,26)), inventario(context) {
 		
 		updateCollRect();
 	}
@@ -76,12 +82,16 @@ private:
 	sf::FloatRect rectColl;
 	sf::Vector2f sizeRC; //size del Rect di Collisione dell'entità
 	Collisions colls;
+private:
+	
+	void Die();
 protected:
 	void updateCollRect() {
 		// è necessario aggiornare il rectColl, a causa del fatto che l'entità si muove.
 		// in altre parole cambierà position.x e position.y
 		rectColl = sf::FloatRect(position.x, position.y, sizeRC.x, sizeRC.y);
 	}
+
 	sf::Vector2f position;
 	sf::Vector2f oldPosition;
 	sf::Sprite sprite;
@@ -94,8 +104,7 @@ protected:
 	bool isblockedS;
 	bool isblockedA;
 	bool isblockedD;
-	
-	bool Touchable(float n1);
+	bool isalive;
 	void DrawEquipment();
 	void RegenHitPoints();
 
@@ -104,15 +113,24 @@ protected:
 	bool S;
 	bool A;
 	bool D;
+
 	char lastDirection;
 	bool Attacking;
 	int SkillAttack;
 	bool Interacting;
+	
+
 
 	sf::Clock clockAttack;
 	sf::Clock clockVitalita;
+	sf::Clock clockDespawn;
+	sf::Clock clockRespawn;
+
+
+	const int despawnTime = 5;
 	float speedHitPointsRecovery = 2.5f;
 	float cooldownAutoAttack = 0.5f;
+	float respawnTime = 10.0f;
 	
 	std::string nome;
 	int vitalita;

@@ -81,7 +81,7 @@ void Entita::setSpawnPoint(sf::Vector2f pos) {
 	position.y = pos.y * 32;
 	sprite.setPosition(pos.x * 32, pos.y * 32);
 }
-void Entita::ResolveCollisions(/*SharedContext* context*/) {
+void Entita::ResolveCollisions() {
 	isblockedA = false, isblockedD = false, isblockedS = false, isblockedW = false;
 
 	//se ci sono state collissioni
@@ -161,55 +161,40 @@ void Entita::ResolveCollisions(/*SharedContext* context*/) {
 		}
 		colls.clear(); //elimino la collissione
 	}
-	Attacking = false, Interacting = false;
+	auto giocatore = dynamic_cast<Giocatore*>(this);
+	if (giocatore != nullptr) {
+		Attacking = false, Interacting = false;
+	}
+	
 }
-void Entita::CollisionEntity(Entita* ent/*, SharedContext* context*/) {
+void Entita::CollisionEntity(Entita* ent) {
 	Mondo* world = context.gameMap;
 	unsigned int tileSize = world->GetTileSize(); //ottengo la dimensione del tile = 32x32 => solo 32.
 
-	int fromX = (int)floor(rectColl.left / tileSize); //rettangolo di collisione dell'entità parte sinistra
-	int toX = (int)floor((rectColl.left + rectColl.width) / tileSize);//rettangolo di collisione dell'entità parte sinistra + larghezza
-	int fromY = (int)floor(rectColl.top / tileSize);//rettangolo di collisione dell'entità parte in alto
-	int toY = (int)floor((rectColl.top + rectColl.height) / tileSize);//rettangolo di collisione dell'entità parte in alto + altezza
-	//( divido per il tilesize perché nei valori di top e height, width e left ci sono pixel )
+	float fromX = rectColl.left; //rettangolo di collisione dell'entità parte sinistra
+	float toX = rectColl.width;  // rettangolo di collisione dell'entità larghezza
+	float fromY = rectColl.top;  //rettangolo di collisione dell'entità parte in alto
+	float toY = rectColl.height; //rettangolo di collisione dell'entità altezza
+	
+	float fromXEnt = ent->GetCollRect().left; //rettangolo di collisione dell'entità parte sinistra
+	float toXEnt = ent->GetCollRect().width;  //rettangolo di collisione dell'entità larghezza
+	float fromYEnt = ent->GetCollRect().top ; //rettangolo di collisione dell'entità parte in alto
+	float toYEnt = ent->GetCollRect().height; //rettangolo di collisione dell'entità altezza
 
-	int fromXEnt = (int)floor(ent->GetCollRect().left / tileSize); //rettangolo di collisione dell'entità parte sinistra
-	int toXEnt = (int)floor((ent->GetCollRect().left + ent->GetCollRect().width) / tileSize);//rettangolo di collisione dell'entità parte sinistra + larghezza
-	int fromYEnt = (int)floor(ent->GetCollRect().top / tileSize);//rettangolo di collisione dell'entità parte in alto
-	int toYEnt = (int)floor((ent->GetCollRect().top + ent->GetCollRect().height) / tileSize);//rettangolo di collisione dell'entità parte in alto + altezza
-	//( divido per il tilesize perché nei valori di top e height, width e left ci sono pixel )
-	// determino da che punto a che punto sull'asse delle x devo fare il controllo.
-	// determino da che punto a che punto sull'asse delle y devo fare il controllo.
-	for (int x = fromX; x <= toX; ++x) {
-		for (int y = fromY; y <= toY; ++y) {
-
-			if (x >= fromXEnt && x <= toXEnt) {
-				if (y >= fromYEnt && y <= toYEnt) {
-					sf::FloatRect tileBounds = sf::FloatRect(x * tileSize, y * tileSize, tileSize, tileSize);
-					// ottengo i boundaries.
-					sf::FloatRect intersection;
-					sf::FloatRect intersectionEnt;
-					rectColl.intersects(tileBounds, intersection);
-					//questa funzione inserisce in "intersection" il valore di ritorno sull'intersezione.
-
-					float area = intersection.width * intersection.height; //calcolo l'area d'intersezione.
-					Tile* tile = new Tile();
-					tile->properties = new TileInfo(&context);
-					tile->properties->blocked = true;
-					CollisionElement e(area, tile->properties, tileBounds, true); //creo un nuovo CollisionElement.
-					colls.emplace_back(e); //lo inserisco nelle collisioni avvenute.
-					this->entitiescollided.push_back(ent);// aggiungo ent alle entità collise
-				}
-				else {
-				}
-			}
-			else {
-			}
-			
-		}
+	sf::FloatRect rect = sf::FloatRect(fromX, fromY, toX, toY);
+	sf::FloatRect rectEnt = sf::FloatRect(fromXEnt, fromYEnt, toXEnt, toYEnt);
+	sf::FloatRect intersection;
+	if (rect.intersects(rectEnt,intersection)) {
+		float area = intersection.width * intersection.height; //calcolo l'area d'intersezione.
+		Tile* tile = new Tile();
+		tile->properties = new TileInfo(&context);
+		tile->properties->blocked = true;
+		CollisionElement e(area, tile->properties, intersection, true); //creo un nuovo CollisionElement.
+		colls.emplace_back(e); //lo inserisco nelle collisioni avvenute.
+		this->entitiescollided.push_back(ent);// aggiungo ent alle entità collise
 	}
 }
-void Entita::ResolveCollisionEntity(/*SharedContext* context*/) {
+void Entita::ResolveCollisionEntity() {
 	Mondo* world = context.gameMap;
 	unsigned int tileSize = world->GetTileSize();
 
@@ -224,36 +209,45 @@ void Entita::ResolveCollisionEntity(/*SharedContext* context*/) {
 			sf::Vector2f entPos = ent->GetSprite().getPosition();
 			float segmentx = (entPos.x - thisPosition.x)/tileSize;  //distanza tra ent e questa entità asse X
 			float segmenty = (entPos.y - thisPosition.y)/tileSize; //distanza tra ent e questa entità asse Y
-	
+			
+			
+
 			if (Attacking) {
 
 				sf::Time elapsed = clockAttack.getElapsedTime();
-
+				Giocatore* x = dynamic_cast<Giocatore*>(this);
+			
 				if (elapsed.asSeconds() > cooldownAutoAttack) {
+					if (x != nullptr) {
 
-					if (segmentx > 0 && this->lastDirection == 'D') { 
-						//caso in cui il nemico è alla mia destra e mi muovo a destra
-						if (Attacco(ent, SkillAttack)) {
+						if (segmentx > 0 && this->lastDirection == 'D') {
+							//caso in cui il nemico è alla mia destra e mi muovo a destra
+							Attacco(ent, SkillAttack);
+							clockAttack.restart();
 						}
-						clockAttack.restart();
+						else if (segmentx <= 0 && this->lastDirection == 'A') {
+							//caso in cui il nemico è alla mia sinistra e mi muovo a sinistra
+							Attacco(ent, SkillAttack);
+							clockAttack.restart();
+						}
+						else if (segmenty > 0 && this->lastDirection == 'S') {
+							//caso in cui il nemico è a sud e mi muovo in basso
+							Attacco(ent, SkillAttack);
+							clockAttack.restart();
+						}
+						else if (segmenty <= 0 && this->lastDirection == 'W') {
+							//caso in cui il nemico è a nord e mi muovo in alto
+							Attacco(ent, SkillAttack);
+							clockAttack.restart();
+						}
+
 					}
-					else if (segmentx <= 0 && this->lastDirection == 'A') {
-						//caso in cui il nemico è alla mia sinistra e mi muovo a sinistra
-						if (Attacco(ent, SkillAttack)) {
-						}
+					else {
+					
+						
+						Attacco(ent, SkillAttack);
 						clockAttack.restart();
-					}
-					else if (segmenty > 0 && this->lastDirection == 'S') {
-						//caso in cui il nemico è a sud e mi muovo in basso
-						if (Attacco(ent, SkillAttack)) {
-						}
-						clockAttack.restart();
-					}
-					else if (segmenty <= 0 && this->lastDirection == 'W') {
-						//caso in cui il nemico è a nord e mi muovo in alto
-						if (Attacco(ent, SkillAttack)) {
-						}
-						clockAttack.restart();
+						
 					}
 				}
 				
@@ -269,16 +263,16 @@ void Entita::ResolveCollisionEntity(/*SharedContext* context*/) {
 			}
 
 			//casi ulteriori (blocco movimento):
-			if (this->D && segmentx > 0 && Touchable(segmenty)){ 
+
+			if (this->D && segmentx > 0){ 
 				//l'entità sta collidendo alla mia destra e mi muovo a destra (ed è toccabile).
 				isblockedD = true;
 			}
-			else if (this->A && segmentx <= 0 && Touchable(segmenty)) {
+			else if (this->A && segmentx <= 0) {
 				//l'entità sta collidendo alla mia sinistra e mi muovo a sinistra (ed è toccabile).
 				isblockedA = true;
 			}
-			else {
-			}
+			
 				
 					
 			if (this->S && segmenty > 0) { 
@@ -313,13 +307,17 @@ void Entita::Update(sf::Time const& dt) {
 
 		if(ps->GetStamina() < ps->GetMaxStamina())
 			ps->RegenStamina();
+
+		if (ps->GetStamina() > 0 && ps->isRunning())
+			ps->StaminaConsRunning();
+		
 	}
 }
 Animator* Entita::GetAnimpg()
 {
 	return &animpg;
 }
-std::vector<AnimSet> Entita::GetAnimations()
+std::vector<AnimSet> Entita::GetAnimations() const
 {
 	return animations;
 }
@@ -330,14 +328,14 @@ Inventario* Entita::GetInventario()
 void Entita::SetMaxVitalita(int vit) {
 	this->maxvitalita = vit;
 }
-int Entita::GetMaxVitalita() {
+int Entita::GetMaxVitalita() const {
 	return this->maxvitalita;
 }
 
 void Entita::SetLastDirection(char newDirection) {
 	this->lastDirection = newDirection;
 }
-char Entita::GetLastDirection() {
+char Entita::GetLastDirection() const{
 	return lastDirection;
 }
 std::string Entita::GetNome() {
@@ -346,32 +344,32 @@ std::string Entita::GetNome() {
 void Entita::SetNome(std::string newnome) {
 	this->nome = newnome;
 }
-int Entita::GetVitalita() {
+int Entita::GetVitalita() const{
 	return this->vitalita;
 }
 void Entita::SetVitalita(int vit) {
 	this->vitalita = vit;
 }
-float  Entita::GetVelocita() {
+float  Entita::GetVelocita() const{
 	return velocita/100;
 }
 void Entita::SetVelocita(float vel) {
 	velocita = vel;
 }
-int Entita::GetForza() {
+int Entita::GetForza() const{
 	return forza;
 }
 void Entita::SetForza(int const& forza) {
 	this->forza = forza;
 }
-int Entita::GetLivello() {
+int Entita::GetLivello() const{
 	return livello;
 }
 void Entita::SetLivello(int const& liv) {
 	livello = liv;
 }
 
-sf::Vector2f Entita::GetPosition() {
+sf::Vector2f Entita::GetPosition() const{
 	return position;
 }
 void Entita::SetPosition(const sf::Vector2f const& newpos) {
@@ -383,13 +381,13 @@ sf::Sprite& Entita::GetSprite() {
 void Entita::SetSprite(sf::Sprite sprite) {
 	this->sprite = sprite;
 }
-sf::FloatRect Entita::GetCollRect() {
+sf::FloatRect Entita::GetCollRect() const{
 	return rectColl;
 }
 void Entita::setContext(SharedContext& context) {
 	this->context = context;
 }
-unsigned int Entita::GetId() {
+unsigned int Entita::GetId() const{
 	return id;
 }
 void Entita::setId(unsigned int id1) {
@@ -401,20 +399,9 @@ void Entita::SetEntityType(const std::string& newType)
 	entitytype = newType;
 }
 
-std::string Entita::GetEntityType()
+std::string Entita::GetEntityType() const
 {
 	return entitytype;
-}
-
-
-
-bool Entita::Touchable(float n1) {
-	float x = abs(n1);
-
-	if (x < 0.84)
-		return true;
-
-	return false;
 }
 
 void Entita::PreparaAttacco(int isSkill) {
@@ -422,43 +409,106 @@ void Entita::PreparaAttacco(int isSkill) {
 	SkillAttack = isSkill;
 	Attacking = true;
 }
+
 void Entita::PreparaInterazione() {
 	// setto l'interazione a true
 	Interacting = true;
 }
 
-bool Entita::isBlockedW()
+void Entita::Hit(int forza)
+{
+	vitalita -= forza / 100;
+	if (vitalita <= 0) {
+		isalive = false;
+		Giocatore* ps = dynamic_cast<Giocatore*>(this);
+		if (ps == nullptr) {
+			Die();
+
+			if (animpg.GetCurrentAnimationName() != "animationDeath")
+				animpg.SwitchAnimation("animationDeath");
+
+			clockDespawn.restart();
+			clockRespawn.restart();
+		}
+		else {
+			if(animpg.GetCurrentAnimationName() != "animationDeath")
+				animpg.SwitchAnimation("animationDeath");
+
+			//game over state
+		}
+	}
+	
+}
+
+bool Entita::isBlockedW() const
 {
 	return isblockedW;
 }
 
-bool Entita::isBlockedS()
+bool Entita::isBlockedS() const
 {
 	return isblockedS;
 }
 
-bool Entita::isBlockedA()
+bool Entita::isBlockedA() const
 {
 	return isblockedA;
 }
-
-bool Entita::isBlockedD()
+ 
+bool Entita::isBlockedD() const
 {
 	return isblockedD;
 }
+
+bool Entita::isAlive() const
+{
+	return isalive;
+}
+
 
 void Entita::RegenHitPoints() {
 	sf::Time regenHP= clockVitalita.getElapsedTime();
 	if (regenHP.asSeconds() >= speedHitPointsRecovery) {
 		regenHP = clockVitalita.restart();
-		vitalita += 1;
+		if(isalive)
+			vitalita += 1;
 	}
 }
 void Entita::setMap(const std::string& map) {
 	this->map = map;
 }
-std::string Entita::getMap() {
+std::string Entita::getMap() const {
 	return this->map;
+}
+const int Entita::getDespawnTime() const
+{
+	return despawnTime;
+}
+sf::Clock Entita::getDespawnClock() const
+{
+	return clockDespawn;
+}
+void Entita::Respawn()
+{
+	if (clockRespawn.getElapsedTime().asSeconds() > respawnTime) {
+	
+		vitalita = maxvitalita;
+		isalive = true;
+
+		auto ps = dynamic_cast<Nemico*>(this);
+		if (ps != nullptr) {
+			ps->StopInseguimento();
+		}
+	}
+}
+
+void Entita::Die()
+{
+	float exp = rand() % 100 + 50;
+
+	unsigned int money = rand() % 5;
+
+	context.entityManager->GetGiocatore()->ProvideLoot(money,exp);
 }
 void Entita::DrawEquipment() {
 	inventario.DrawItems();
