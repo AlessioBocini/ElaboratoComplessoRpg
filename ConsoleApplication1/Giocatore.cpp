@@ -3,17 +3,45 @@
 #include "Tile.h"
 
 #include "Mondo.h"
+#include "Nemico.h"
 
+
+void Giocatore::LevelUp()
+{
+	this->livello++;
+	this->exp = 0;
+	this->vitalita = this->maxvitalita;
+	this->stamina = this->maxstamina;
+	//this->expToLvlUp++; lascio fisso a 500
+	// TODO faccio fare la scelta tra 3  oggetti/skill/statistiche 
+}
 
 bool Giocatore::Attacco(Entita *ent, int Skill) {
 	bool executed = false;
+	if (!ent->isAlive()) 
+		return executed;
+
+	ent->PreparaAttacco(); //il nemico si arrabbia
+	Nemico* nem = dynamic_cast<Nemico*>(ent);
+	if (nem != nullptr) {
+		if (!nem->isFollowing()) {
+			nem->PreparaInseguimento();
+		}
+	}
 
 	switch (Skill)
 	{
 	case -1: {
 		if ((stamina - 10) >= 0) {
 			stamina -= 10;
-			ent->SetVitalita(ent->GetVitalita()-(forza/100));
+
+			bool usingweap = false;
+			if (GetInventario()->GetWeapon() != nullptr)
+				usingweap = GetInventario()->GetWeapon()->GetUsing();
+
+			int weapDmg = (usingweap == true) ? GetInventario()->GetWeapon()->GetForza() : 0;
+
+			ent->Hit(forza*(10 + weapDmg));
 			executed = true;
 		}
 		
@@ -68,7 +96,7 @@ bool Giocatore::Interazione(Entita & ent) {
 	return true;
 }
 
-int Giocatore::GetStamina()
+int Giocatore::GetStamina() const
 {
 	return stamina;
 }
@@ -78,7 +106,7 @@ void Giocatore::SetStamina(int stam)
 	this->stamina = stam;
 }
 
-int Giocatore::GetMaxStamina()
+int Giocatore::GetMaxStamina() const
 {
 	return maxstamina;
 }
@@ -88,7 +116,7 @@ void Giocatore::SetMaxStamina(int stam)
 	this->maxstamina = stam;
 }
 
-float Giocatore::GetExp()
+float Giocatore::GetExp() const
 {
 	return exp;
 }
@@ -104,14 +132,49 @@ void Giocatore::ToggleInventory()
 }
 
 void Giocatore::RegenStamina() {
+	if (!running) {
 		sf::Time regenStamina = clockStamina.getElapsedTime();
-	if (regenStamina.asSeconds() >= speedStaminaRecovery) {
-		regenStamina = clockStamina.restart();
-		stamina += 1;
+		if (regenStamina.asSeconds() >= speedStaminaRecovery) {
+			clockStamina.restart();
+			stamina += 1;
+		}
 	}
 }
 
-std::vector<Quickslot>* Giocatore::GetQuickslots()
+void Giocatore::StaminaConsRunning()
+{
+	if (running) {
+		sf::Time consumeStamina = clockRunningStamina.getElapsedTime();
+		if (consumeStamina.asSeconds() >= staminaSpeedRunning) {
+			clockRunningStamina.restart();
+			stamina -= 1;
+		}
+	}
+}
+
+std::vector<Quickslot>* Giocatore::GetQuickslots() 
 {
 	return &quickslots;
+}
+
+bool Giocatore::isRunning() const
+{
+	return running;
+}
+void Giocatore::SetRunning(bool run) {
+	running = run;
+}
+void Giocatore::ProvideLoot(unsigned int money, unsigned int exp, std::vector<Equipaggiamento> equip)
+{
+	this->exp += exp;
+	std::cout << "Hai ottenuto " << exp << " exp" << std::endl;
+	if (this->exp >= this->expToLvlUp) {
+		this->LevelUp();
+		std::cout << "Congratulazioni, sei passato al livello "<<livello<< std::endl;
+	}
+	this->inventario.AddDenaro(money);
+
+	for (auto it : equip)
+		this->inventario.AggiungiOggetto(it,0);
+
 }
