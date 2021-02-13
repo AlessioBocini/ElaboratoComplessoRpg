@@ -1,6 +1,6 @@
 #include "Arma.h"
 #include "EntityManager.h"
-int Arma::GetForza() {
+int Arma::GetForza() const{
 	return this->forza;
 }
 void Arma::SetForza(int const& forza) {
@@ -11,7 +11,7 @@ void Arma::SetForza(int const& forza) {
 void Arma::SetSprite(sf::Sprite newSprite) {
 	this->sprite = newSprite;
 }
-sf::Sprite& Arma::GetSprite() {
+sf::Sprite& Arma::GetSprite(){
 	return this->sprite;
 }
 
@@ -20,12 +20,13 @@ Animator* Arma::GetAnimpg()
 	return &animpg;
 }
 
-std::vector<AnimSet> Arma::GetAnimations()
+std::vector<AnimSet> Arma::GetAnimations() const
 {
 	return animations;
 }
 
 void Arma::Reset(const std::string& anim) {
+	
 	EntityManager* entitymanager = context.entityManager;
 	float playerWidth = entitymanager->GetGiocatore()->GetSprite().getGlobalBounds().width;
 	float playerHeight = entitymanager->GetGiocatore()->GetSprite().getGlobalBounds().height;
