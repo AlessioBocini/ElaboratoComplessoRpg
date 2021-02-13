@@ -1,7 +1,9 @@
 #include "Nemico.h"
 #include "Mondo.h"
+#include "EntityManager.h"
 
 void Nemico::Movimento(const float &x, const float &y) {
+
 	oldPosition = position;
 	position += sf::Vector2f(x, y);
 	A = false, D = false, S = false, W = false;
@@ -23,31 +25,106 @@ void Nemico::Movimento(const float &x, const float &y) {
 
 	updateCollRect(); //aggiorna le informazioni sulle collisioni
 }
+
+int Nemico::nextStep()
+{
+	int value =4;
+	if (!following) {
+		value = rand() % 4;
+		return value;
+	}
+	
+	Giocatore* player = context.entityManager->GetGiocatore();
+	float myX = floor(position.x/Tile_Size), myY = floor(position.y / Tile_Size), myOldX = oldPosition.x / Tile_Size, myOldY = oldPosition.y / Tile_Size;
+	float playerX = floor(player->GetPosition().x / Tile_Size), playerY = floor(player->GetPosition().y / Tile_Size);
+
+
+	if (playerY - myY < 0) {
+		//verso il alto
+		value = 3;
+	}
+	else if(playerY - myY > 0){
+		//verso basso
+		value = 2;
+	}
+
+	if (playerX - myX > 0) {
+		//verso destra
+		value = 0;
+	}
+	else if(playerX - myX < 0) {
+		//verso sinistra
+		value = 1;
+	}
+	
+	return value;
+}
+void Nemico::PreparaInseguimento()
+{
+	clockFaseInseguimento.restart();
+	following = true;
+}
+void Nemico::StopInseguimento()
+{
+	following = false;
+}
+bool Nemico::isFollowing()
+{
+	return following;
+}
 bool Nemico::Attacco(Entita*ent, int isSkill) {
+
+	if (!isalive)return 1;
+
+	Giocatore* player = dynamic_cast<Giocatore*>(ent); //only towards player
+	if(player != nullptr)
+		ent->Hit(forza * 10);
+	
 	return 0;
 }
 void Nemico::PreparaMovimento() {
+	if (!isalive) return;
 	sf::Time elapsed = clockDecisioneMovimento.getElapsedTime();
-	if (elapsed.asSeconds() > 2.0f) {
-		int value = rand() % 4;
+	int time = decisioneMovimentoTime;
+
+	if (following) {
+		if (clockFaseInseguimento.getElapsedTime().asSeconds() > faseInseguimentoTime) {
+			following = false;
+			Attacking = false;
+		}
+	}
+	int speedreducer = 1;
+	if (following) {
+		time /= 3;
+		speedreducer = 3;
+	}
+		
+
+	if (elapsed.asSeconds() > time) {
+
+		int value = nextStep();
 
 		switch (value)
 		{
 		case 0:
-			Movimento(GetVelocita(), 0);
-			animpg.SwitchAnimation("animationD");
+			Movimento(GetVelocita()/speedreducer, 0);
+			if (animpg.GetCurrentAnimationName() != "animationD")
+				animpg.SwitchAnimation("animationD");
 			break;
 		case 1:
-			Movimento(-GetVelocita(), 0);
-			animpg.SwitchAnimation("animationA");
+			Movimento(-GetVelocita() / speedreducer, 0);
+			if (animpg.GetCurrentAnimationName() != "animationA")
+				animpg.SwitchAnimation("animationA");
 			break;
 		case 2:
-			Movimento(0, GetVelocita());
-			animpg.SwitchAnimation("animationS");
+			Movimento(0, GetVelocita() / speedreducer);
+			if (animpg.GetCurrentAnimationName() != "animationS")
+				animpg.SwitchAnimation("animationS");
 			break;
 		case 3:
-			Movimento(0, -GetVelocita());
-			animpg.SwitchAnimation("animationW");
+			Movimento(0, -GetVelocita() / speedreducer);
+			if(animpg.GetCurrentAnimationName() != "animationW")
+				animpg.SwitchAnimation("animationW");
 			break;
 		default:
 			break;
@@ -70,7 +147,7 @@ void Nemico::PreparaMovimento() {
 
 }
 
-sf::Clock Nemico::getClock()
+sf::Clock Nemico::getClock() const
 {
 	return clockDecisioneMovimento;
 }

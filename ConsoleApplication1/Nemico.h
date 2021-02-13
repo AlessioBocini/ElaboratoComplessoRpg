@@ -9,15 +9,29 @@ public:
 	bool Attacco(Entita*ent,int isSkill) override;
 	void Movimento(const float &x, const float &y) override;
 	void PreparaMovimento();
-	int GetEnemyType() {
+	int GetEnemyType() const {
 		return enemyType;
 	}
 	void SetEnemyType(const int &type) {
 		enemyType = type;
 	}
-	sf::Clock getClock();
-	
+	sf::Clock getClock() const;
+	// run to player
+	int nextStep();
+	void PreparaInseguimento();
+	void StopInseguimento();
+	bool isFollowing();
+
+
 private:
 	int enemyType;
+	bool following;
+
 	sf::Clock clockDecisioneMovimento;
+	int decisioneMovimentoTime = 2;
+
+	sf::Clock clockFaseInseguimento;
+	int faseInseguimentoTime = 15;
+
+	sf::Clock clockFaseAttacco;
 };
