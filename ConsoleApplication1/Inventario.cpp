@@ -3,11 +3,23 @@
 #include "GameManager.h"
 bool Inventario::EliminaOggetto(Equipaggiamento& equip) {
 	// TODO REMOVE equipment using this function not statically
+	for (int it = 0; it < this->equip.size();++it) {
+		if (this->equip[it]->GetNomeEquip() == equip.GetNomeEquip()) {
+			//il primo che trova lo rimuove
+
+		}
+	}
+
+
 	return true;
 }
 bool Inventario::AggiungiOggetto(Equipaggiamento& equip, int value) {
-	// TODO ADD equipment using this function not statically
-	// Imagine i have the pointer Arma*
+	if (this->equip.size() >= maxNumberofSlots) {
+		// non è possibile aggiungere più di [maxnumberofslots] equip.
+		return false;
+	}
+		
+
 	auto ps = static_cast<Arma*>(&equip);
 	if (ps == nullptr) {
 		//armatura
@@ -18,31 +30,31 @@ bool Inventario::AggiungiOggetto(Equipaggiamento& equip, int value) {
 
 		Arma* weap = new Arma(equip.GetNomeEquip(),equip.GetIcon(),equip.GetIconActivated(),value,context);
 
-		this->equip.push_back(weap);
+		this->equip.push_back(std::unique_ptr<Arma>(weap));
 
 		Animator* animpg = weap->GetAnimpg();
 
 		int width = 58, height = 12;
-		auto& animA = animpg->CreateAnimation("armaA", "../assets/images/pack/Weapons/test1.png", sf::seconds(1), true);
+		auto& animA = animpg->CreateAnimation("armaA", "assets/images/pack/Weapons/test1.png", sf::seconds(1), true);
 		animA.AddFrames(sf::Vector2i(0, 0), sf::Vector2i(width, height), 3);
 		weap->GetAnimations().push_back(animA);
 
-		auto& animidleA = animpg->CreateAnimation("armaIDLEA", "../assets/images/pack/Weapons/test1.png", sf::seconds(1), true);
+		auto& animidleA = animpg->CreateAnimation("armaIDLEA", "assets/images/pack/Weapons/test1.png", sf::seconds(1), true);
 		animidleA.AddFrames(sf::Vector2i(width, 0), sf::Vector2i(width, height), 1);
 		weap->GetAnimations().push_back(animidleA);
 
-		auto& animD = animpg->CreateAnimation("armaD", "../assets/images/pack/Weapons/test2.png", sf::seconds(1), true);
+		auto& animD = animpg->CreateAnimation("armaD", "assets/images/pack/Weapons/test2.png", sf::seconds(1), true);
 		animD.AddFrames(sf::Vector2i(0, 0), sf::Vector2i(width, height), 3);
 		weap->GetAnimations().push_back(animD);
-		auto& animIDLED = animpg->CreateAnimation("armaIDLED", "../assets/images/pack/Weapons/test2.png", sf::seconds(1), true);
+		auto& animIDLED = animpg->CreateAnimation("armaIDLED", "assets/images/pack/Weapons/test2.png", sf::seconds(1), true);
 		animIDLED.AddFrames(sf::Vector2i(width, 0), sf::Vector2i(width, height), 1);
 		weap->GetAnimations().push_back(animIDLED);
 
-		auto& animS = animpg->CreateAnimation("armaS", "../assets/images/pack/Characters/deathanimations.png", sf::seconds(1), true);
+		auto& animS = animpg->CreateAnimation("armaS", "assets/images/pack/Characters/deathanimations.png", sf::seconds(1), true);
 		animS.AddFrames(sf::Vector2i(0, Tile_Size), sf::Vector2i(Tile_Size, Tile_Size), 1);
 		weap->GetAnimations().push_back(animS);
 
-		auto& animW = animpg->CreateAnimation("armaW", "../assets/images/pack/Characters/deathanimations.png", sf::seconds(1), true);
+		auto& animW = animpg->CreateAnimation("armaW", "assets/images/pack/Characters/deathanimations.png", sf::seconds(1), true);
 		animW.AddFrames(sf::Vector2i(0, Tile_Size), sf::Vector2i(Tile_Size, Tile_Size), 1);
 		weap->GetAnimations().push_back(animW);
 
@@ -56,12 +68,12 @@ void Inventario::ConfiguraEquip() {
 	/// 
 	/// 
 	/// 
-	auto& inventoryAnim = this->animpg.CreateAnimation("inventory", "../assets/images/inventoryfull.png", sf::seconds(1), true);
+	auto& inventoryAnim = this->animpg.CreateAnimation("inventory", "assets/images/inventoryfull.png", sf::seconds(1), true);
 	inventoryAnim.AddFrames(sf::Vector2i(0, 0), sf::Vector2i(330, 245), 1);
 	this->animations.push_back(inventoryAnim);
 	this->animpg.SwitchAnimation("inventory");
 
-	auto& moneta = this->animpgMoneta.CreateAnimation("moneta", "../assets/images/sheet.png", sf::seconds(1), true);
+	auto& moneta = this->animpgMoneta.CreateAnimation("moneta", "assets/images/sheet.png", sf::seconds(1), true);
 	moneta.AddFrames(sf::Vector2i(0, 16), sf::Vector2i(16, 16), 1);
 	this->animationsMoneta.push_back(moneta);
 	this->animpgMoneta.SwitchAnimation("moneta");
@@ -71,8 +83,8 @@ void Inventario::ConfiguraEquip() {
 	/// WEAPON
 	/// 
 	/// 
-	Equipaggiamento equip = Equipaggiamento("weapon", "../assets/images/pack/Weapons/weaponicon.png", "../assets/images/pack/Weapons/weaponiconactivate.png");
-	AggiungiOggetto(equip,20);
+	Equipaggiamento equip = Equipaggiamento("Arma Base", "assets/images/pack/Weapons/weaponicon.png", "assets/images/pack/Weapons/weaponiconactivate.png");
+	AggiungiOggetto(equip,10);
 
 }
 
@@ -96,6 +108,21 @@ void Inventario::DrawInventory()
 	context.wind->Draw(invetoryMenutitle); //titolo
 	context.wind->Draw(moneta); // icona moneta
 	context.wind->Draw(denaroText); // numero denaro
+
+	auto weap = GetWeapon();
+	weaponName.setString("");
+	weaponStats.setString("");
+	weaponName.setPosition(sprite.getPosition().x + 20, sprite.getPosition().y + 60 );
+	weaponStats.setPosition(sprite.getPosition().x + 20, sprite.getPosition().y + 70);
+	weaponName.setScale(0.3f, 0.3f), weaponStats.setScale(0.3f, 0.3f);
+	weaponName.setFillColor(sf::Color::Black), weaponStats.setFillColor(sf::Color::Black);
+	if (weap != nullptr) {
+		weaponName.setString("Nome : " + weap->GetNomeEquip());
+		weaponStats.setString("Forza : "+ std::to_string(weap->GetForza()));
+	}
+	
+	context.wind->Draw(weaponName); 
+	context.wind->Draw(weaponStats);
 	for (int i = 0; i < equip.size(); ++i) {
 		auto spriteIcon = equip[i]->getIconSprite();
 		spriteIcon.setPosition(RecognizePositionSlotById(i));
@@ -105,41 +132,42 @@ void Inventario::DrawInventory()
 	
 }
 void Inventario::DrawItems() {
-	for (auto i : equip) {
-		if (i == nullptr)
+	for (int i = 0; i < equip.size(); i++) {
+		/*if (i == nullptr)
 			continue;
+		*/
 
-		if(i->GetUsing())
-			if (static_cast<Arma*>(i) == nullptr) {
+		if (equip[i].get()->GetUsing()) {
+			auto weap = static_cast<Arma*>(equip[i].get());
+			if (weap == nullptr) {
 				//armatura
 			}
 			else {
-				context.wind->Draw(((Arma*)i)->GetSprite());
+				context.wind->Draw(weap->GetSprite());
 			}
 		}
+	}
 }
 	
 void Inventario::UpdateItems(sf::Time const& dt) {
 	
 	Giocatore* giocatore = context.entityManager->GetGiocatore();
-	for (auto i : equip) {
-		if (i == nullptr)
+	for (int i = 0; i < equip.size(); i++) {
+		/*if (i == nullptr)
 			continue;
-
-		auto ps = static_cast<Arma*>(i);
+		*/
+		auto* ps = static_cast<Arma*>(equip[i].get());
 		if ( ps == nullptr) {
 			//armatura
 		}
 		else {
-			
-
-			float widthWeap = ((Arma*)i)->GetSprite().getGlobalBounds().width;
-			float heightWeap = ((Arma*)i)->GetSprite().getGlobalBounds().height;
+			float widthWeap = ps->GetSprite().getGlobalBounds().width;
+			float heightWeap = ps->GetSprite().getGlobalBounds().height;
 			float playerWidth = giocatore->GetSprite().getGlobalBounds().width;
 			float playerHeight = giocatore->GetSprite().getGlobalBounds().height;
 			char direction = giocatore->GetLastDirection();
 
-			((Arma*)i)->GetAnimpg()->update(dt);
+			ps->GetAnimpg()->update(dt);
 			
 		}
 		//se inventario è visibile
