@@ -35,8 +35,8 @@ public:
 
 	void EraseMap();
 	Tile* GetTileByCoords(int x, int y);
-	TileInfo* GetDefaultTile();
-	std::string GetCurrentTerritory();
+	//TileInfo* GetDefaultTile();
+	std::string GetCurrentTerritory() const;
 	void SetCurrentTerritory(const std::string& territory);
 	Arredamento* GetDecorationByCoords(int x, int y);
 	DecorationManager* GetDecorationManager();

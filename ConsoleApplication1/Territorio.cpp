@@ -12,7 +12,7 @@ Tile* Territorio::GetTileByCoords(int x, int y) {
 	return (itr != tileMap.end()) ? itr->second : nullptr;
 }
 
-std::string Territorio::GetCurrentTerritory()
+std::string Territorio::GetCurrentTerritory() const
 {
 	return currentTerritory;
 }
@@ -65,7 +65,7 @@ const sf::Vector2u& Territorio::GetMapSize() const {
 void Territorio::LoadMap(const std::string& filepath, bool first) {
 	currentTerritory = filepath;
 
-	std::string path = "../assets/files/"+filepath+"/";
+	std::string path = "assets/files/"+filepath+"/";
 	std::string postfix = ".map";
 	std::ifstream file;
 	int teleportcounter = 0;
