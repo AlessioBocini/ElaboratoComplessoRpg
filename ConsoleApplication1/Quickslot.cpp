@@ -15,7 +15,7 @@ void Quickslot::Draw()
 void Quickslot::ConfigureQuickslot()
 {
 	//skill TODO 
-	Icon = sf::Sprite(context.assetManager->GetTexture("../assets/images/quickslot.png"));
+	Icon = sf::Sprite(context.assetManager->GetTexture("assets/images/quickslot.png"));
 }
 
 
