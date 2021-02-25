@@ -1,6 +1,7 @@
 #include "Nemico.h"
 #include "Mondo.h"
 #include "EntityManager.h"
+#include "GameManager.h"
 
 void Nemico::Movimento(const float &x, const float &y) {
 
@@ -26,39 +27,7 @@ void Nemico::Movimento(const float &x, const float &y) {
 	updateCollRect(); //aggiorna le informazioni sulle collisioni
 }
 
-int Nemico::nextStep()
-{
-	int value =4;
-	if (!following) {
-		value = rand() % 4;
-		return value;
-	}
-	
-	Giocatore* player = context.entityManager->GetGiocatore();
-	float myX = floor(position.x/Tile_Size), myY = floor(position.y / Tile_Size), myOldX = oldPosition.x / Tile_Size, myOldY = oldPosition.y / Tile_Size;
-	float playerX = floor(player->GetPosition().x / Tile_Size), playerY = floor(player->GetPosition().y / Tile_Size);
 
-
-	if (playerY - myY < 0) {
-		//verso il alto
-		value = 3;
-	}
-	else if(playerY - myY > 0){
-		//verso basso
-		value = 2;
-	}
-
-	if (playerX - myX > 0) {
-		//verso destra
-		value = 0;
-	}
-	else if(playerX - myX < 0) {
-		//verso sinistra
-		value = 1;
-	}
-	
-	return value;
-}
 void Nemico::PreparaInseguimento()
 {
 	clockFaseInseguimento.restart();
@@ -72,13 +41,21 @@ bool Nemico::isFollowing()
 {
 	return following;
 }
+bool Nemico::Interazione(Entita& ent)
+{
+	if (clockInterazione.getElapsedTime().asSeconds() < cooldownInterazione)
+		return false;
+	//something
+	clockInterazione.restart();
+	return true;
+}
 bool Nemico::Attacco(Entita*ent, int isSkill) {
 
 	if (!isalive)return 1;
 
 	Giocatore* player = dynamic_cast<Giocatore*>(ent); //only towards player
 	if(player != nullptr)
-		ent->Hit(forza * 10);
+		ent->Hit(forza);
 	
 	return 0;
 }
@@ -101,8 +78,10 @@ void Nemico::PreparaMovimento() {
 		
 
 	if (elapsed.asSeconds() > time) {
-
-		int value = nextStep();
+		auto player = context.entityManager->GetGiocatore();
+		auto strategy = context.gameManager->GetFollowContext(); 
+		strategy.Prepare(this,player);
+		short int value = strategy.Operation();
 
 		switch (value)
 		{

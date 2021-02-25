@@ -17,11 +17,10 @@ public:
 	}
 	sf::Clock getClock() const;
 	// run to player
-	int nextStep();
 	void PreparaInseguimento();
 	void StopInseguimento();
 	bool isFollowing();
-
+	bool Interazione(Entita& ent) override;
 
 private:
 	int enemyType;
