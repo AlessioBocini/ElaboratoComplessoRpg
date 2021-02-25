@@ -6,9 +6,11 @@ State_Game::~State_Game() {}
 
 void State_Game::OnCreate() {
 	stateManager->GetContext()->gameManager->SetInPauseGame(false);
+	stateManager->GetContext()->gameManager->SetGameOverGame(false);
 	EventManager* eventManag = stateManager->GetContext()->eventManager;
 	eventManag->AddCallback(StateType::Game, "Key_Escape", &State_Game::MainMenu, this);
 	eventManag->AddCallback(StateType::Game, "Key_P", &State_Game::Pause, this);
+	eventManag->AddCallback(StateType::Game, "Intro_Continue", &State_Game::GameOver, this);
 	sf::Vector2u size = stateManager->GetContext()->wind->GetwindowSize();
 	view.setSize((float)size.x, (float)size.y);
 	view.setCenter(size.x / 2, size.y / 2);
@@ -20,13 +22,13 @@ void State_Game::OnCreate() {
 		song->setVolume(0);
 		song->setLoop(true);
 	}
-
-
 }
+
 void State_Game::OnDestroy() {
 	EventManager* eventManag = stateManager->GetContext()->eventManager;
 	eventManag->RemoveCallback(StateType::Game, "Key_Escape");
 	eventManag->RemoveCallback(StateType::Game, "Key_P");
+	eventManag->RemoveCallback(StateType::Game, "Intro_Continue");
 }
 
 void State_Game::Update(const sf::Time& time) {
@@ -44,7 +46,10 @@ void State_Game::Update(const sf::Time& time) {
 		view.setCenter(((context->gameMap->getActualMap().GetMapSize().x + 1) * Sheet::Tile_Size) - (viewSpace.width / 2), view.getCenter().y);
 		context->wind->GetRenderWindow()->setView(view);
 	}
-
+	if (context->gameManager->isGameOver()) {
+		stateManager->SwitchTo(StateType::GameOver);
+		
+	}
 }
 
 //il giocatore dovrà essere mostrato solo ed esclusivamente durante lo stato di gioco.
@@ -53,6 +58,7 @@ void State_Game::Draw() {
 	base->gameMap->Draw();
 	base->gameManager->DrawEntities();
 	base->gameManager->DrawDebugMenu();
+	base->gameManager->DrawAchiement();
 }
 
 void State_Game::MainMenu(EventDetails* details) {
@@ -63,6 +69,10 @@ void State_Game::MainMenu(EventDetails* details) {
 void State_Game::Pause(EventDetails* details) {
 	stateManager->GetContext()->gameManager->SetInPauseGame(true);
 	stateManager->SwitchTo(StateType::Paused);
+	// non viene rimosso per far si che sia possibile rimettere in pausa il gioco.
+}
+void State_Game::GameOver(EventDetails* details) {
+	stateManager->SwitchTo(StateType::GameOver);
 	// non viene rimosso per far si che sia possibile rimettere in pausa il gioco.
 }
 
