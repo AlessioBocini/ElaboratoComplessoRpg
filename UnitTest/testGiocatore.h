@@ -12,9 +12,61 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+
+sf::FloatRect rectColl;
+sf::Vector2f position;
+
+sf::Vector2f playerStartPoint;
+sf::Vector2f enemyStartPoint;
+int playerforza = 10;
+int playerMaxVitalita = 100;
+int playervitalita = playerMaxVitalita;
+bool playerisalive = true;
+class Equipaggiamento {
+public:
+	int GetForza() {
+		return forza;
+	}
+	void SetForza(int value) {
+		forza = value;
+	}
+	Equipaggiamento() : Equipaggiamento(0){}
+	Equipaggiamento(int value) : forza(value){}
+private:
+	int forza;
+};
+class Inventario {
+public:
+	std::vector<Equipaggiamento> getEquip() {
+		return equip;
+	}
+	Equipaggiamento* getActive() {
+		if (idActive < 0) return nullptr;
+		return &equip[idActive];
+	}
+	bool AddEquip(Equipaggiamento eq) {
+		if (equip.size()>= maxSlots)
+			return false;
+		equip.push_back(eq);
+		return true;
+	}
+	int UseLastWeap() {
+		idActive = equip.size() - 1;
+		return idActive;
+	}
+	Inventario():Inventario(16){}
+	Inventario(int maxSlots): idActive(-1),maxSlots(maxSlots){}
+private:
+	std::vector<Equipaggiamento> equip;
+	int idActive;
+	int maxSlots;
+};
+
+Inventario inv;
+
 class Nemico {
 public:
-	Nemico(sf::Vector2f pos):pos(pos){}
+	Nemico(sf::Vector2f pos):pos(pos), maxvitalita(100),vitalita(100){}
 
 	~Nemico() {}
 	void PreparaMovimento();
@@ -33,10 +85,69 @@ public:
 	sf::Vector2f *GetPos() {
 		return &pos;
 	}
+	int nextStep() {
+		int value = 4;
+		if (!following) {
+			value = rand() % 4;
+			return value;
+		}
+
+		//Giocatore* player = context.entityManager->GetGiocatore();
+		float myX = floor(pos.x / 32), myY = floor(pos.y / 32);
+		float playerX = floor(position.x / 32), playerY = floor(position.y / 32);
+		
+		if (playerY - myY < 0) {
+			//verso il alto
+			value = 3;
+		}
+		else if (playerY - myY > 0) {
+			//verso basso
+			value = 2;
+		}
+
+		if (playerX - myX > 0) {
+			//verso destra
+			value = 0;
+		}
+		else if (playerX - myX < 0) {
+			//verso sinistra
+			value = 1;
+		}
+
+		return value;
+	}
+	void Attacco() {
+		playervitalita -= forza;
+		if (playervitalita <= 0) {
+			playerisalive = false;
+		}
+	}
+	void SetFollowing(bool value) {
+		following = value;
+	}
+
+	void SetVitalita(int value) {
+		vitalita = value;
+	}
+	int GetMaxVitalita() {
+		return maxvitalita;
+	}
+	int GetVitalita() {
+		return vitalita;
+	}
+	void SetForza(int value) {
+		forza = value;
+	}
 private:
 	int enemyType;
 	sf::Vector2f pos;
 	sf::FloatRect rectColl;
+	bool following;
+
+	int forza;
+	int maxvitalita;
+	int vitalita;
+
 };
 
 using TileId = unsigned int;
@@ -51,7 +162,7 @@ struct TileInfo {
 		sf::IntRect tileBoundaries(this->id % (1366 / 32) * 32, this->id / (720 / 32) * 32,
 			32, 32);
 		sf::Texture texture1;
-		texture1.loadFromFile("../assets/images/cel2.png");
+		texture1.loadFromFile("assets/images/cel2.png");
 		sprite.setTexture(texture1);
 		sprite.setTextureRect(tileBoundaries);
 
@@ -80,15 +191,11 @@ struct Tile {
 	}
 };
 
+
 using TileSet = std::unordered_map<TileId, TileInfo>;
 using TileMap = std::unordered_map<TileId, Tile>;
-sf::FloatRect rectColl;
-sf::Vector2f position;
 TileSet tileSet;
 TileMap tileMap;
-sf::Vector2f playerStartPoint;
-sf::Vector2f enemyStartPoint;
-
 
 
 void updateCollRect() {
@@ -176,7 +283,18 @@ bool  CheckCollisionsDeadly(const std::string& world) {
 }
 
 
+bool RegenVitalita() {
+	bool regenerated = false;
+	if (!playerisalive)
+		return regenerated;
+	int regen = 10;
+	if (playervitalita < playerMaxVitalita) {
+		playervitalita += regen;
+		regenerated = true;
+	}
+	return regenerated;
 
+}
 void LoadTiles(const std::string& filepath) {
 	std::ifstream file;
 	file.open(filepath);
@@ -201,7 +319,7 @@ void LoadTiles(const std::string& filepath) {
 }
 
 void LoadMap(const std::string& filepath, bool first, Nemico* ent =nullptr) {
-	std::string path = "../assets/files/mock/";
+	std::string path = "assets/files/mock/";
 	std::string postfix = ".map";
 	std::ifstream file;
 	file.open(path + filepath + postfix);
@@ -349,6 +467,20 @@ void SetEnemySpawnpoint(Nemico* ent) {
 	ent->GetPos()->x = enemyStartPoint.x * 32;
 	ent->GetPos()->y = enemyStartPoint.y * 32;
 	ent->updateCollRect();
+}
+bool Attacco(Nemico* ent) {
+
+	Equipaggiamento* equip = inv.getActive();
+	int weapforza = 0;
+	if (equip != nullptr)
+		weapforza = equip->GetForza();
+	ent->SetVitalita(ent->GetVitalita() - (playerforza + weapforza));
+
+	if (ent->GetVitalita() <= 0) 
+		return false;
+	
+	return true;
+
 }
 void CollisionEntity(Nemico* ent,std::vector<Nemico*>* entitiescollided) {
 	unsigned int tileSize = 32;

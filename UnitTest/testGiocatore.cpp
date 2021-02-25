@@ -53,7 +53,7 @@ TEST(TestGiocatore, Attacco) {
 
 	Nemico ent =Nemico(sf::Vector2f(0,0));
 	std::vector<Nemico*> entities;
-	LoadTiles("../assets/files/tiles.txt");
+	LoadTiles("assets/files/tiles.txt");
 	LoadMap(world, false, &ent);
 	setSpawnPoint();
 	SetEnemySpawnpoint(&ent);
@@ -82,7 +82,7 @@ TEST(TestGiocatore, InterazioneEntita) {
 
 	Nemico ent = Nemico(sf::Vector2f(0, 0));
 	std::vector<Nemico*> entities;
-	LoadTiles("../assets/files/tiles.txt");
+	LoadTiles("assets/files/tiles.txt");
 	LoadMap(world, false, &ent);
 	setSpawnPoint();
 	SetEnemySpawnpoint(&ent);
@@ -111,7 +111,7 @@ TEST(TestGiocatore, NOInterazioneEntita) {
 
 	Nemico ent = Nemico(sf::Vector2f(0, 0));
 	std::vector<Nemico*> entities;
-	LoadTiles("../assets/files/tiles.txt");
+	LoadTiles("assets/files/tiles.txt");
 	LoadMap(world, false, &ent);
 	setSpawnPoint();
 	SetEnemySpawnpoint(&ent);
@@ -140,7 +140,7 @@ TEST(TestGiocatore, NoAttacco) {
 
 	Nemico ent = Nemico(sf::Vector2f(0, 0));
 	std::vector<Nemico*> entities;
-	LoadTiles("../assets/files/tiles.txt");
+	LoadTiles("assets/files/tiles.txt");
 	LoadMap(world, false, &ent);	
 	setSpawnPoint();
 	Movimento(1, 0);
@@ -162,13 +162,34 @@ TEST(TestGiocatore, NoAttacco) {
 	tileMap.clear();
 	EXPECT_EQ(0, attacco);
 }
+TEST(TestGiocatore, OverflowRegenVitalita) {
+	//suppongo sia il momento di rigenerare la vita e la vitalita è massima
+	playervitalita = playerMaxVitalita;
+	playerisalive = true;
+	EXPECT_FALSE(RegenVitalita());
+}
+
+TEST(TestGiocatore, RegenDeadPlayer) {
+	//suppongo sia il momento di rigenerare la vita e il player è morto
+	playerisalive = false;
+	EXPECT_FALSE(RegenVitalita());
+}
+
+TEST(TestGiocatore, RegenNormal) {
+	//suppongo sia il momento di rigenerare la vita
+	playervitalita = 20;
+	playerisalive = true;
+	bool regen = RegenVitalita();
+
+	EXPECT_TRUE(regen);
+}
 TEST(TestInteraction, CollisioneConBlocked) {
 	char pulsante = 'd';
 	const std::string world = "mock1";
 	bool movimento;
 
 
-	LoadTiles("../assets/files/tiles.txt");
+	LoadTiles("assets/files/tiles.txt");
 	LoadMap(world, false);
 	setSpawnPoint();
 	switch (pulsante) {
@@ -191,7 +212,7 @@ TEST(TestInteraction, CollisioneConNonBlocked) {
 	bool movimento;
 
 
-	LoadTiles("../assets/files/tiles.txt");
+	LoadTiles("assets/files/tiles.txt");
 	LoadMap(world, false);
 	setSpawnPoint();
 	switch (pulsante) {
@@ -214,7 +235,7 @@ TEST(TestInteraction, CollisioneConNoNTeleport) {
 	bool movimento;
 
 
-	LoadTiles("../assets/files/tiles.txt");
+	LoadTiles("assets/files/tiles.txt");
 	LoadMap(world, false);
 	setSpawnPoint();
 	switch (pulsante) {
@@ -237,7 +258,7 @@ TEST(TestInteraction, CollisioneConTeleport) {
 	bool movimento;
 
 
-	LoadTiles("../assets/files/tiles.txt");
+	LoadTiles("assets/files/tiles.txt");
 	LoadMap(world, false);
 	setSpawnPoint();
 	switch (pulsante) {
@@ -260,7 +281,7 @@ TEST(TestInteraction, CollisioneConDeadly) {
 	bool movimento;
 
 
-	LoadTiles("../assets/files/tiles.txt");
+	LoadTiles("assets/files/tiles.txt");
 	LoadMap(world, false);
 	setSpawnPoint();
 	switch (pulsante) {
@@ -283,7 +304,7 @@ TEST(TestInteraction, CollisioneConNoNDeadly) {
 	bool movimento;
 
 
-	LoadTiles("../assets/files/tiles.txt");
+	LoadTiles("assets/files/tiles.txt");
 	LoadMap(world, false);
 	setSpawnPoint();
 	switch (pulsante) {
@@ -299,6 +320,412 @@ TEST(TestInteraction, CollisioneConNoNDeadly) {
 
 	tileMap.clear();
 	EXPECT_EQ(0, collision);
+}
+
+TEST(TestInseguimento, Versosinistra) {
+	//char pulsante = 'f';
+	const std::string world = "mock6";
+	//bool attacco;
+	
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	ent.SetFollowing(true);
+	int dec = ent.nextStep();
+
+
+	entities.clear();
+	tileMap.clear();
+	EXPECT_EQ(1, dec);
+}
+TEST(TestInseguimento, Versodestra) {
+	//char pulsante = 'f';
+	const std::string world = "mock7";
+	//bool attacco;
+
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	ent.SetFollowing(true);
+	int dec = ent.nextStep();
+
+
+	entities.clear();
+	tileMap.clear();
+	EXPECT_EQ(0, dec);
+}
+TEST(TestInseguimento, VersoAlto) {
+	//char pulsante = 'f';
+	const std::string world = "mock9";
+	//bool attacco;
+
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	ent.SetFollowing(true);
+	int dec = ent.nextStep();
+
+
+	entities.clear();
+	tileMap.clear();
+	EXPECT_EQ(3, dec);
+}
+TEST(TestInseguimento, VersoBasso) {
+	//char pulsante = 'f';
+	const std::string world = "mock8";
+	//bool attacco;
+
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	ent.SetFollowing(true);
+	int dec = ent.nextStep();
+
+
+	entities.clear();
+	tileMap.clear();
+	EXPECT_EQ(2, dec);
+}
+
+
+TEST(TestDanno, dannoBase) {
+	char pulsante = 'f';
+	const std::string world = "mock5";
+	bool attacco;
+
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	Movimento(1, 0);
+	updateCollRect();
+	switch (pulsante) {
+		case 'f': {
+			CollisionEntity(&ent, &entities);
+			attacco = ResolveCollisionEntity(pulsante, &entities);
+			break;
+		}
+		default: {
+			attacco = false;
+		}
+	}
+	if (attacco) {
+		Attacco(entities[0]);
+	}
+
+	int maxvit = entities[0]->GetMaxVitalita();
+	int vitalita = entities[0]->GetVitalita();
+
+	entities.clear();
+	tileMap.clear();
+	EXPECT_EQ(vitalita,(maxvit-playerforza));
+}
+
+TEST(TestDanno, dannoMaggiorato) {
+	char pulsante = 'f';
+	const std::string world = "mock5";
+	bool attacco;
+	inv.AddEquip(Equipaggiamento(10));
+
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	Movimento(1, 0);
+	updateCollRect();
+	inv.UseLastWeap();
+	switch (pulsante) {
+	case 'f': {
+		CollisionEntity(&ent, &entities);
+		attacco = ResolveCollisionEntity(pulsante, &entities);
+		break;
+	}
+	default: {
+		attacco = false;
+	}
+	}
+	if (attacco) {
+		Attacco(entities[0]);
+	}
+
+	int maxvit = entities[0]->GetMaxVitalita();
+	int vitalita = entities[0]->GetVitalita();
+
+	entities.clear();
+	tileMap.clear();
+	inv.getEquip().clear();
+	EXPECT_FALSE(vitalita == (maxvit - playerforza));
+}
+
+TEST(TestGiocatore, MorteGiocatore) {
+	char pulsante = 'f';
+	const std::string world = "mock5";
+	bool attacco;
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	Movimento(1, 0);
+	updateCollRect();
+	playervitalita = 100;
+	playerisalive = true;
+	switch (pulsante) {
+	case 'f': {
+		CollisionEntity(&ent, &entities);
+		attacco = ResolveCollisionEntity(pulsante, &entities);
+		break;
+	}
+	default: {
+		attacco = false;
+	}
+	}
+	if (attacco) {
+		entities[0]->SetForza(playervitalita);
+		entities[0]->Attacco();
+	}
+
+	
+
+	entities.clear();
+	tileMap.clear();
+	EXPECT_FALSE(playerisalive);
+}
+
+TEST(TestGiocatore, dannoVitalitadaMostro) {
+	char pulsante = 'f';
+	const std::string world = "mock5";
+	bool attacco;
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	Movimento(1, 0);
+	updateCollRect();
+	playervitalita = 100;
+	playerisalive = true;
+	switch (pulsante) {
+	case 'f': {
+		CollisionEntity(&ent, &entities);
+		attacco = ResolveCollisionEntity(pulsante, &entities);
+		break;
+	}
+	default: {
+		attacco = false;
+	}
+	}
+	if (attacco) {
+		entities[0]->SetForza(10);
+		entities[0]->Attacco();
+	}
+
+
+
+	entities.clear();
+	tileMap.clear();
+	EXPECT_TRUE(playerisalive);
+}
+
+TEST(TestInventario, SelezioneOggettiDiversi) {
+	inv.AddEquip(Equipaggiamento(10));
+	int idLast = inv.UseLastWeap(); //seleziono primo slot
+
+	inv.AddEquip(Equipaggiamento(10));
+	int idCurrent = inv.UseLastWeap(); //seleziono slot adiacente sulla destra
+
+	inv.getEquip().clear();
+	EXPECT_FALSE(idLast == idCurrent);
+}
+TEST(TestInventario, InserimentoOggettiOverflow) {
+	Inventario inve = Inventario(2);
+	inve.AddEquip(Equipaggiamento(10));
+	inve.AddEquip(Equipaggiamento(10));
+	inve.AddEquip(Equipaggiamento(10));
+	inve.AddEquip(Equipaggiamento(10));
+	int Nitems = inve.getEquip().size();
+
+	inve.getEquip().clear();
+	EXPECT_FALSE( Nitems == 4);
+}
+
+TEST(TestGiocatore, CompraArma) {
+	Inventario inve = Inventario(2);
+	char pulsante = 'r';
+	const std::string world = "mock5";
+	bool interazione;
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	Movimento(1, 0);
+	updateCollRect();
+	switch (pulsante) {
+	case 'r': {
+		CollisionEntity(&ent, &entities);
+		interazione = ResolveCollisionEntity(pulsante, &entities);
+		break;
+	}
+	default: {
+		interazione = false;
+	}
+	}
+	int denaro = 10;
+	int costoOggetto = 2;
+	if (interazione && denaro>=costoOggetto) {
+		denaro -= 2;
+		inve.AddEquip(Equipaggiamento(10));
+	}
+	int size = inve.getEquip().size();
+
+	inve.getEquip().clear();
+	entities.clear();
+	tileMap.clear();
+	EXPECT_TRUE(1 == size); // interazione avvenuta con successo
+}
+
+TEST(TestGiocatore, NoCompraArma) {
+	Inventario inve = Inventario(2);
+	char pulsante = 'r';
+	const std::string world = "mock5";
+	bool interazione;
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	Movimento(1, 0);
+	updateCollRect();
+	switch (pulsante) {
+	case 'r': {
+		CollisionEntity(&ent, &entities);
+		interazione = ResolveCollisionEntity(pulsante, &entities);
+		break;
+	}
+	default: {
+		interazione = false;
+	}
+	}
+	int denaro = 1;
+	int costoOggetto = 2;
+	if (interazione && denaro >= costoOggetto) {
+		denaro -= 2;
+		inve.AddEquip(Equipaggiamento(10));
+	}
+	int size = inve.getEquip().size();
+
+	inve.getEquip().clear();
+	entities.clear();
+	tileMap.clear();
+	EXPECT_FALSE(1 == size); // interazione avvenuta con successo
+}
+
+TEST(TestGiocatore, OttieneAchievement) {
+	char pulsante = 'f';
+	const std::string world = "mock5";
+	bool attacco;
+	int mobskilled = 2;
+	int mobstogetAchievement = 3;
+
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	Movimento(1, 0);
+	updateCollRect();
+	ent.SetVitalita(1);
+	switch (pulsante) {
+	case 'f': {
+		CollisionEntity(&ent, &entities);
+		attacco = ResolveCollisionEntity(pulsante, &entities);
+		break;
+	}
+	default: {
+		attacco = false;
+	}
+	}
+	bool isAlive = true;
+
+	if (attacco) {
+		//entities[0]->SetVitalita(1);
+		isAlive = Attacco(entities[0]);
+	}
+	
+	
+	if (!isAlive) {
+		mobskilled++;
+	}
+	
+
+	entities.clear();
+	tileMap.clear();
+	EXPECT_EQ(mobskilled, mobstogetAchievement);
+}
+
+TEST(TestGiocatore, NoNOttieneAchievement) {
+	char pulsante = 'f';
+	const std::string world = "mock5";
+	bool attacco;
+	int mobskilled = 1;
+	int mobstogetAchievement = 3;
+
+	Nemico ent = Nemico(sf::Vector2f(0, 0));
+	std::vector<Nemico*> entities;
+	LoadTiles("assets/files/tiles.txt");
+	LoadMap(world, false, &ent);
+	setSpawnPoint();
+	SetEnemySpawnpoint(&ent);
+	Movimento(1, 0);
+	updateCollRect();
+	ent.SetVitalita(1);
+	switch (pulsante) {
+	case 'f': {
+		CollisionEntity(&ent, &entities);
+		attacco = ResolveCollisionEntity(pulsante, &entities);
+		break;
+	}
+	default: {
+		attacco = false;
+	}
+	}
+	bool isAlive = true;
+	if (attacco) {
+		//entities[0]->SetVitalita(1);
+		isAlive = Attacco(entities[0]);
+	}
+
+
+	if (!isAlive) {
+		mobskilled++;
+	}
+
+
+	entities.clear();
+	tileMap.clear();
+	EXPECT_FALSE(mobskilled == mobstogetAchievement);
 }
 int main(int argc, char** argv) {
 	::testing::InitGoogleTest(&argc, argv);
