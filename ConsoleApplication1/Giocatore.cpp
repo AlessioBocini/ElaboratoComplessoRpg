@@ -4,7 +4,7 @@
 
 #include "Mondo.h"
 #include "Nemico.h"
-
+#include "NPC.h"
 
 void Giocatore::LevelUp()
 {
@@ -29,6 +29,9 @@ bool Giocatore::Attacco(Entita *ent, int Skill) {
 		}
 	}
 
+	if (nem == nullptr) //TODO estendi per miniboss
+		return false;
+
 	switch (Skill)
 	{
 	case -1: {
@@ -41,7 +44,9 @@ bool Giocatore::Attacco(Entita *ent, int Skill) {
 
 			int weapDmg = (usingweap == true) ? GetInventario()->GetWeapon()->GetForza() : 0;
 
-			ent->Hit(forza*(10 + weapDmg));
+			bool killed = ent->Hit(forza + weapDmg);
+			if (killed)
+				IncreaseMobsKilled();
 			executed = true;
 		}
 		
@@ -91,9 +96,16 @@ bool Giocatore::EquipWeapon(const Arma const& obj) {
 	return true;
 }
 bool Giocatore::Interazione(Entita & ent) {
-	std::cout << "sto parlando con : " << ent.GetNome() << std::endl;
-	Interacting = false;
-	return true;
+	bool executed = false;
+	if (clockInterazione.getElapsedTime().asSeconds() >= cooldownInterazione) {
+		std::cout << "sto parlando con : " << ent.GetNome() << std::endl;
+		ent.Interazione(*this);
+		Interacting = false;
+		executed = true;
+		clockInterazione.restart();
+	}
+	
+	return executed;
 }
 
 int Giocatore::GetStamina() const
@@ -163,6 +175,18 @@ bool Giocatore::isRunning() const
 }
 void Giocatore::SetRunning(bool run) {
 	running = run;
+}
+Subject& Giocatore::GetSubject()
+{
+	return subject;
+}
+void Giocatore::IncreaseMobsKilled(unsigned int value)
+{
+	mobskilled += value;
+}
+unsigned int Giocatore::GetMobsKilled()
+{
+	return mobskilled;
 }
 void Giocatore::ProvideLoot(unsigned int money, unsigned int exp, std::vector<Equipaggiamento> equip)
 {
