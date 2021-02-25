@@ -22,6 +22,10 @@ bool GameManager::SaveGame() {
 void  GameManager::RegenStamina() {
 
 }
+void GameManager::RestartAchievementClock()
+{
+	clockAchievement.restart();
+}
 sf::Vector2i GameManager::GetSpriteSize() const
 {
 	return spriteSize;
@@ -41,20 +45,22 @@ void GameManager::SetGameOverGame(bool value)
 {
 	GameOver = value;
 }
-GameManager::GameManager() : m_window("rpg game", sf::Vector2u(1366, 720), false, context), world(context), spriteSize(32, 32), entitymanager(context), stateManager(context, this), isPaused(false), GameOver(false), isDebugMenuActive(false), isConcolePressed(false), assetmanager(context) {
+GameManager::GameManager() : m_window("rpg game", sf::Vector2u(1366, 720), false, context), world(context), spriteSize(32, 32), timeDisplayAchievement(3.5),diplayAchievement(false),entitymanager(context), achievementmanager(context), stateManager(context, this), isPaused(false), GameOver(false), isDebugMenuActive(false), isConcolePressed(false), assetmanager(context), textAchievement(sf::Text("", context.assetManager->GetFont("arial.ttf"))) {
 	context.gameManager = this;
 	Giocatore* player = entitymanager.GetGiocatore();
+	
 	context.gameMap = &world;
 	context.wind = &m_window;
 	context.eventManager = m_window.GetEventManager();
 	context.assetManager = &assetmanager;
 	context.entityManager = &entitymanager;
 	stateManager.SwitchTo(StateType::Intro);
-	background_song.openFromFile("../assets/Music/Refrain.ogg");
+	background_song.openFromFile("assets/Music/Refrain.ogg");
 	textFormula.setFont(assetmanager.GetFont("arial.ttf"));
 	world.LoadMaps();
 	world.SetPrevMap("map1");
 	entitymanager.ConfigurePlayer();
+	observer = std::unique_ptr<Observer>(new Observer(player->GetSubject(),context));
 }
 
 GameManager::~GameManager() {}
@@ -68,6 +74,8 @@ void GameManager::Update() {
 	if (!isPaused) {
 		world.getActualMap().Update(elapsed);
 		entitymanager.Update(elapsed);
+		achievementmanager.CheckAchievements();
+		
 	}
 
 }
@@ -325,6 +333,7 @@ void GameManager::Render() {
 	stateManager.Draw();
 
 	m_window.EndDraw();
+	
 }
 
 Window* GameManager::getWindow() {
@@ -375,6 +384,16 @@ void GameManager::DrawDebugMenu() {
 
 
 
+void GameManager::SetDisplayAchievement(bool value)
+{
+	diplayAchievement = value;
+}
+
+void GameManager::SetTextAchivement(std::string message)
+{
+	textAchievement.setString("Achievement : "+message);
+}
+
 void GameManager::DrawEntities() {
 
 	float nametextweight = 0.5, infoweight = 0.25;
@@ -398,6 +417,26 @@ void GameManager::DrawEntities() {
 	}
 	
 	entitymanager.Draw();
+}
+void GameManager::DrawAchiement()
+{
+
+	float time = clockAchievement.getElapsedTime().asSeconds();
+	if (diplayAchievement) {
+
+		textAchievement.setPosition((m_window.GetViewSpace().left+m_window.GetViewSpace().width/2) , m_window.GetViewSpace().top +10);
+		textAchievement.setFillColor(sf::Color::Yellow);
+		textAchievement.setScale(0.8f, 0.8f);
+		textAchievement.setOutlineColor(sf::Color::Black);
+		textAchievement.setOutlineThickness(1);
+		m_window.Draw(textAchievement);
+	}
+
+	if (time >= timeDisplayAchievement) {
+		textAchievement.setString("");
+		diplayAchievement = false;
+	}
+
 }
 void GameManager::SetMaxFramerate(float limit) {
 	sf::RenderWindow* renderWindow = m_window.GetRenderWindow();
