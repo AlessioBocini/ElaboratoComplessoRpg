@@ -15,9 +15,10 @@ class Entita {
 public:
 	virtual void Movimento(const float &x, const float &y) = 0;
 	virtual bool Attacco(Entita* ent, int isSkill) = 0;
+	virtual bool Interazione(Entita& ent) = 0;
 	void PreparaAttacco(int isSkill = -1);
 	void PreparaInterazione();
-	void Hit(int forza);
+	bool Hit(int forza);
 
 	bool isBlockedW() const;
 	bool isBlockedS() const;
@@ -60,13 +61,15 @@ public:
 	const int getDespawnTime() const;
 	sf::Clock getDespawnClock() const;
 	void Respawn();
+	bool isVisible() const;
+	void setVisible(bool val);
 
 	void CheckCollisions();
 	// è una funzione che mi serve a determinare se ci sono state collissioni e di che tipo
 	void CollisionEntity(Entita* ent);
 	void ResolveCollisions(); // è una funzione che mi server per determinare cosa fare per le determinate collissioni, che decisioni prendere.
 	void ResolveCollisionEntity();
-	Entita(const std::string &nome, const int &forza, const int &vitalita, const int &livello, const float &velocita, const sf::Vector2f &pos, unsigned int id, SharedContext& context, const std::string const &entityType) : entitytype(entityType), id(id), context(context), vitalita(vitalita),maxvitalita(vitalita), nome(nome), forza(forza), velocita(velocita), livello(livello), sprite(sf::Sprite()), isblockedA(false), isblockedD(false), isblockedS(false), isblockedW(false), A(false),D(false),W(false),S(false),Attacking(false),Interacting(false), isalive(true), lastDirection('S'),animpg(sprite),sizeRC(sf::Vector2f(25,26)), inventario(context) {
+	Entita(const std::string &nome, const int &forza, const int &vitalita, const int &livello, const float &velocita, const sf::Vector2f &pos, unsigned int id, SharedContext& context, const std::string const &entityType) : entitytype(entityType), id(id), context(context), vitalita(vitalita),maxvitalita(vitalita), nome(nome), forza(forza), velocita(velocita), livello(livello), sprite(sf::Sprite()), isblockedA(false), isblockedD(false), isblockedS(false), isblockedW(false), A(false),D(false),W(false),S(false),visible(true),Attacking(false),Interacting(false), isalive(true), lastDirection('S'),animpg(sprite),sizeRC(sf::Vector2f(25,26)), inventario(context) {
 		
 		updateCollRect();
 	}
@@ -118,19 +121,21 @@ protected:
 	bool Attacking;
 	int SkillAttack;
 	bool Interacting;
-	
+	bool visible;
 
 
 	sf::Clock clockAttack;
 	sf::Clock clockVitalita;
 	sf::Clock clockDespawn;
 	sf::Clock clockRespawn;
+	sf::Clock clockInterazione;
 
-
-	const int despawnTime = 5;
+	const int despawnTime = 3;
 	float speedHitPointsRecovery = 2.5f;
 	float cooldownAutoAttack = 0.5f;
+	float cooldownInterazione = 0.5f;
 	float respawnTime = 10.0f;
+
 	
 	std::string nome;
 	int vitalita;

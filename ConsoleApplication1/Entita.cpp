@@ -415,15 +415,16 @@ void Entita::PreparaInterazione() {
 	Interacting = true;
 }
 
-void Entita::Hit(int forza)
+bool Entita::Hit(int forza)
 {
-	vitalita -= forza / 100;
+	bool isdead = false;
+	vitalita -= forza ;
 	if (vitalita <= 0) {
 		isalive = false;
 		Giocatore* ps = dynamic_cast<Giocatore*>(this);
 		if (ps == nullptr) {
+			
 			Die();
-
 			if (animpg.GetCurrentAnimationName() != "animationDeath")
 				animpg.SwitchAnimation("animationDeath");
 
@@ -433,11 +434,12 @@ void Entita::Hit(int forza)
 		else {
 			if(animpg.GetCurrentAnimationName() != "animationDeath")
 				animpg.SwitchAnimation("animationDeath");
-
+			
 			//game over state
 		}
+		isdead = true;
 	}
-	
+	return isdead;
 }
 
 bool Entita::isBlockedW() const
@@ -464,6 +466,8 @@ bool Entita::isAlive() const
 {
 	return isalive;
 }
+
+
 
 
 void Entita::RegenHitPoints() {
@@ -494,12 +498,23 @@ void Entita::Respawn()
 	
 		vitalita = maxvitalita;
 		isalive = true;
+		visible = true;
 
 		auto ps = dynamic_cast<Nemico*>(this);
 		if (ps != nullptr) {
 			ps->StopInseguimento();
 		}
 	}
+}
+
+bool Entita::isVisible() const
+{
+	return visible;
+}
+
+void Entita::setVisible(bool val)
+{
+	visible = val;
 }
 
 void Entita::Die()
