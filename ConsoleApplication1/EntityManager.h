@@ -5,7 +5,6 @@
 #include "Miniboss.h"
 #include "Giocatore.h"
 #include "NPC.h"
-
 using EntityContainer = std::unordered_map<unsigned int, Entita*>;
 using EnemyTypes = std::unordered_map < std::string, std::string>;
 using EntityFactory = std::unordered_map<EntityType, std::function<Entita* (void)>>;
@@ -24,7 +23,7 @@ public:
 	void ConfigurePlayer();
 	void Update(const sf::Time& elapsed);
 	void Draw();
-	std::vector<Entita*> getEntities();
+	std::vector<Entita*> getEntities() const;
 	Giocatore* GetGiocatore();
 	void EraseAll();
 
@@ -33,4 +32,5 @@ private:
 	std::vector<Entita*> entities;
 	Giocatore player;
 	SharedContext& context;
+	unsigned int id;
 };

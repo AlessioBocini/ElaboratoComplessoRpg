@@ -3,28 +3,31 @@
 #include "GameManager.h"
 #include "Mondo.h"
 
-EntityManager::EntityManager(SharedContext& context) :player("alessio", sf::Vector2f(0, 0),context) , context(context){}
+EntityManager::EntityManager(SharedContext& context) :player("alessio", sf::Vector2f(0, 0),context) , context(context),id(1){}
 void EntityManager::ConfigurePlayer() {
 	Animator* animpg = player.GetAnimpg();
 	player.setSpawnPoint(context.gameMap->getActualMap().GetPlayerStartpoint());
 	sf::Vector2i spritesize = context.gameManager->GetSpriteSize();
-	auto& animationA = animpg->CreateAnimation("animationA", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+	auto& animationA = animpg->CreateAnimation("animationA", "assets/images/pack/Characters/people1.png", sf::seconds(1), true);
 	animationA.AddFrames(sf::Vector2i(0, spritesize.y), spritesize, 3);
-	auto& animationS = animpg->CreateAnimation("animationS", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+	auto& animationS = animpg->CreateAnimation("animationS", "assets/images/pack/Characters/people1.png", sf::seconds(1), true);
 	animationS.AddFrames(sf::Vector2i(0, 0), spritesize, 3);
-	auto& animationD = animpg->CreateAnimation("animationD", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+	auto& animationD = animpg->CreateAnimation("animationD", "assets/images/pack/Characters/people1.png", sf::seconds(1), true);
 	animationD.AddFrames(sf::Vector2i(0, spritesize.y * 2), spritesize, 3);
-	auto& animationW = animpg->CreateAnimation("animationW", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+	auto& animationW = animpg->CreateAnimation("animationW", "assets/images/pack/Characters/people1.png", sf::seconds(1), true);
 	animationW.AddFrames(sf::Vector2i(0, spritesize.y * 3), spritesize, 3);
 
-	auto& animationIdleA = animpg->CreateAnimation("animationIDLEA", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+	auto& animationIdleA = animpg->CreateAnimation("animationIDLEA", "assets/images/pack/Characters/people1.png", sf::seconds(1), true);
 	animationIdleA.AddFrames(sf::Vector2i(spritesize.x, spritesize.y), spritesize, 1);
-	auto& animationIdleS = animpg->CreateAnimation("animationIDLES", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+	auto& animationIdleS = animpg->CreateAnimation("animationIDLES", "assets/images/pack/Characters/people1.png", sf::seconds(1), true);
 	animationIdleS.AddFrames(sf::Vector2i(spritesize.x, 0), spritesize, 1);
-	auto& animationIdleD = animpg->CreateAnimation("animationIDLED", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+	auto& animationIdleD = animpg->CreateAnimation("animationIDLED", "assets/images/pack/Characters/people1.png", sf::seconds(1), true);
 	animationIdleD.AddFrames(sf::Vector2i(spritesize.x, spritesize.y * 2), spritesize, 1);
-	auto& animationIdleW = animpg->CreateAnimation("animationIDLEW", "../assets/images/pack/Characters/people1.png", sf::seconds(1), true);
+	auto& animationIdleW = animpg->CreateAnimation("animationIDLEW", "assets/images/pack/Characters/people1.png", sf::seconds(1), true);
 	animationIdleW.AddFrames(sf::Vector2i(spritesize.x, spritesize.y * 3), spritesize, 1);
+	auto& animationDeath = animpg->CreateAnimation("animationDeath", "assets/images/pack/Characters/deathanimations.png", sf::seconds(1), true);
+	animationDeath.AddFrames(sf::Vector2i(0, 0), spritesize, 4);
+
 
 	player.GetInventario()->ConfiguraEquip();
 	for (int i = 0; i < 3; i++) {
@@ -42,7 +45,7 @@ EntityManager::~EntityManager() {
 Giocatore* EntityManager::GetGiocatore() {
 	return &player;
 }
-std::vector<Entita*> EntityManager::getEntities() {
+std::vector<Entita*> EntityManager::getEntities() const {
 	return entities;
 }
 
@@ -53,13 +56,13 @@ int EntityManager::Add(const EntityType& type, const std::string& name, const st
 	int posX = 0, posY = 0;
 	std::string path = "";
 	if (type == EntityType::NPC) {
-		Npc* n = new Npc(name1, 0, 100, 1, 60, pos, 3, context);
+		Npc* n = new Npc(name1, 0, 100, 1, 60, pos, id, context);
 		Animator* animpg = n->GetAnimpg();
 		if (details == int(NpcType::Shopkeeper)) {
 			n->SetEntityType("Shopkeeper");
 			posY = spritesize.y;
 			posX = spritesize.x * 3;
-			path = "../assets/images/pack/Characters/people1.png";
+			path = "assets/images/pack/Characters/people1.png";
 		}
 		auto& animationeShopkeeperA = animpg->CreateAnimation("animationA", path, sf::seconds(1), true);
 		animationeShopkeeperA.AddFrames(sf::Vector2i(posX,posY), spritesize, 3);
@@ -98,13 +101,13 @@ int EntityManager::Add(const EntityType& type, const std::string& name, const st
 
 	//TODO Miniboss
 	if (type == EntityType::Enemy) {
-		Nemico* n = new Nemico(name1, 0, 100, 1, 60, pos, 2, context);
+		Nemico* n = new Nemico(name1, 3 , 100, 1, 60, pos, id, context);
 		Animator* animpg = n->GetAnimpg();
 		if (details == int(EnemyType::Skeleton)) {
 			n->SetEntityType("Nemico1");
 			posY = spritesize.y;
 			posX = spritesize.x * 9;
-			path = "../assets/images/pack/Characters/people2.png";
+			path = "assets/images/pack/Characters/people2.png";
 		}
 		auto& animationenemyA = animpg->CreateAnimation("animationA", path, sf::seconds(1), true);
 		animationenemyA.AddFrames(sf::Vector2i(posX, posY), spritesize, 3);
@@ -122,11 +125,17 @@ int EntityManager::Add(const EntityType& type, const std::string& name, const st
 		animationenemyW.AddFrames(sf::Vector2i(posX, posY * 3), spritesize, 3);
 		n->GetAnimations().push_back(animationenemyW);
 
+		//cambia
+		auto& animationenemyDeath = animpg->CreateAnimation("animationDeath","assets/images/pack/Tilesets/AH_B.png" , sf::seconds(1), true);
+		animationenemyDeath.AddFrames(sf::Vector2i(Tile_Size*5, Tile_Size * 7), spritesize, 1);
+		n->GetAnimations().push_back(animationenemyW);
+
 		animpg->SwitchAnimation("animationD");
 		n->setMap(filepath);
 		n->SetEnemyType(details);
 		entities.push_back(n);
 	}
+	id++;
 	return 0;
 
 }
@@ -162,7 +171,7 @@ bool EntityManager::Remove(unsigned int id)
 }
 
 void EntityManager::Update(const sf::Time& dt) {
-	player.CheckCollisions(/*context*/);
+	player.CheckCollisions();
 	player.GetInventario()->UpdateItems(dt);
 
 	std::string currentTerritory = context.gameMap->getActualMap().GetCurrentTerritory();
@@ -170,26 +179,36 @@ void EntityManager::Update(const sf::Time& dt) {
 	for (Entita* i : entities) {
 		if (i->getMap() != currentTerritory)
 			continue;
-		
+	
 		Nemico* Enemy = dynamic_cast<Nemico*>(i);
 		if(Enemy != nullptr)
-			Enemy->PreparaMovimento(); //movimento mock per i nemici
+			Enemy->PreparaMovimento(); //movimento per i nemici
 
+		if (!i->isAlive())
+		{
+			if (i->getDespawnClock().getElapsedTime().asSeconds() > i->getDespawnTime()) {
+				i->setVisible(false);
+				i->Respawn();
+				continue;
+			}
+			
+		}
+			
 		i->Update(dt);
-		i->CheckCollisions(/*context*/);
-		i->CollisionEntity(&player/*, context*/);
-		player.CollisionEntity(i/*, context*/);
+		i->CheckCollisions();
+		i->CollisionEntity(&player);
+		player.CollisionEntity(i);
 		for (Entita* k : entities) {
 			if (i == k)
 				continue;
-			i->CollisionEntity(k/*, context*/);
+			i->CollisionEntity(k);
 		}		
 	}
 
 	for (Entita* i : entities) {
-		i->ResolveCollisions(/*context*/);
+		i->ResolveCollisions();
 	}
-	player.ResolveCollisions(/*context*/);
+	player.ResolveCollisions();
 }
 
 void EntityManager::Draw() {
@@ -231,7 +250,7 @@ void EntityManager::Draw() {
 	level.setPosition(positionPlayer.x + (globalBoundsPlayer.width) + player.GetNome().size(), positionPlayer.y - globalBoundsPlayer.height);
 	m_window->Draw(player.GetSprite());
 	
-	//player->GetInventario().DrawItems();
+	player.GetInventario()->DrawItems();
 
 	//disegno le caratteristiche dei nemici
 	sf::Text nameEne;
@@ -243,7 +262,7 @@ void EntityManager::Draw() {
 	for (Entita* i : getEntities()) {
 
 		if (i->getMap() != currentTerritory) continue;
-
+		if (!i->isVisible()) continue;
 		m_window->Draw(i->GetSprite());
 
 		Miniboss* psMiniboss = dynamic_cast<Miniboss*>(i);
@@ -276,12 +295,16 @@ void EntityManager::Draw() {
 			nameEne.setPosition(positionEntity.x - (globalBoundsEntity.width) / 4 - 15, positionEntity.y - globalBoundsEntity.height);
 			vitalitaEne.setPosition(positionEntity.x - (globalBoundsEntity.width) / 3, positionEntity.y - globalBoundsEntity.height / 3);
 			levelEne.setPosition(positionEntity.x + (globalBoundsEntity.width) + i->GetNome().size(), positionEntity.y - globalBoundsEntity.height);
-			m_window->Draw(nameEne);
-			m_window->Draw(levelEne);
-			m_window->Draw(vitalitaEne);
+			if (i->isAlive()) {
+				m_window->Draw(nameEne);
+				m_window->Draw(levelEne);
+				m_window->Draw(vitalitaEne);
+			}
+			
 		}
 	}
 
+	
 	m_window->Draw(name);
 	m_window->Draw(level);
 	m_window->Draw(vitalita);
