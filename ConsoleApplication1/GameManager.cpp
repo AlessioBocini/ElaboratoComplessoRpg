@@ -13,6 +13,10 @@ bool GameManager::isButtonPressedSKill(std::string const& buttonPressed) const{
 bool GameManager::isGameOver() const {
 	return GameOver;
 }
+bool GameManager::isGodMode() const
+{
+	return godmode;
+}
 bool GameManager::LoadGame() {
 	return true;
 }
@@ -78,6 +82,11 @@ void GameManager::Update() {
 		
 	}
 
+}
+
+int GameManager::GetGodModeValue() const
+{
+	return godmodevalue;
 }
 
 void GameManager::SetPlayerStart(const sf::Vector2f& a) {
@@ -249,13 +258,15 @@ void GameManager::ApplyFormula() {
 		if (!godmode) {
 			std::cout << "god mode enabled" << std::endl;
 			
-			giocatore->SetVitalita(80000);
-			giocatore->SetStamina(80000);
+			giocatore->SetVitalita(godmodevalue);
+			giocatore->SetStamina(godmodevalue);
 		}
 		else {
 			std::cout << "god mode disabled" << std::endl;
 
 			giocatore->SetVitalita(giocatore->GetMaxVitalita());
+			giocatore->SetStamina(giocatore->GetMaxStamina());
+
 		}
 		godmode = !(godmode);
 
