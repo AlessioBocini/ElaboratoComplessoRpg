@@ -1,5 +1,8 @@
 # Il Progettino
 
+inventario, movimento, descrizione arma
+![Alt Text](part1.gif)
+
 In questa gif mostrerò l'attacco, il consumo di stamina, rigenerazione vita/stamina, inventario, morte e respawn dei nemici, possibilità di comprare armi da negoziante
 possibilità di avere armi diverse in slot diversi e la morte del player.
 ![Alt Text](main.gif)
