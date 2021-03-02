@@ -12,5 +12,8 @@ acquisto arma, armi diverse con statistiche diverse
 la morte del player.
 ![Alt Text](parte4.gif)
 
-In questa gif mostrerò il fatto che posso fare level up, la presenza di achievements e la possibilità di utilizzare una console di comandi.
+possibilità di utilizzare una console di comandi
+![Alt Text](parte5.gif)
+
+In questa gif mostrerò il fatto che posso fare level up, la presenza di achievements.
 ![Alt Text](other.gif)
