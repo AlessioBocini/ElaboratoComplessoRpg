@@ -10,7 +10,7 @@ acquisto arma, armi diverse con statistiche diverse
 ![Alt Text](negozio.gif)
 
 la morte del player.
-![Alt Text](main.gif)
+![Alt Text](part4.gif)
 
 In questa gif mostrerò il fatto che posso fare level up, la presenza di achievements e la possibilità di utilizzare una console di comandi.
 ![Alt Text](other.gif)
