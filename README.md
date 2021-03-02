@@ -4,7 +4,7 @@ inventario, movimento, descrizione arma
 ![Alt Text](part1.gif)
 
 inseguimento nemico, uccisione nemico, drop denaro, respawn nemico.
-![Alt Text](https://media0.giphy.com/media/pd5G7RkHZvNCPg3r8E/giphy.gif)
+![Alt Text](part0.2.gif)
 
 In questa gif mostrerò l'attacco, il consumo di stamina, rigenerazione vita/stamina, inventario, morte e respawn dei nemici, possibilità di comprare armi da negoziante
 possibilità di avere armi diverse in slot diversi e la morte del player.
