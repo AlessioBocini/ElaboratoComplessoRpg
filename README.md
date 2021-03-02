@@ -15,5 +15,5 @@ la morte del player.
 possibilità di utilizzare una console di comandi
 ![Alt Text](part5.gif)
 
-In questa gif mostrerò il fatto che posso fare level up, la presenza di achievements.
-![Alt Text](other.gif)
+la presenza di achievements.
+![Alt Text](part6.gif)
