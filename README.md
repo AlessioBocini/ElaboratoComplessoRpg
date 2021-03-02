@@ -6,7 +6,6 @@ inventario, movimento, descrizione arma
 uccisione nemico, drop denaro, respawn nemico.
 ![Alt Text](part3.gif)
 
-<img src="part0.2.gif" width="800" height="600"/>
 acquisto arma, armi diverse con statistiche diverse
 ![Alt Text](negozio.gif)
 
