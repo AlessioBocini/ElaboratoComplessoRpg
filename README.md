@@ -17,3 +17,6 @@ possibilità di utilizzare una console di comandi
 
 la presenza di achievements.
 ![Alt Text](part6.gif)
+
+possibilità di fare level up con reset delle risorse
+![Alt Text](part7.gif)
