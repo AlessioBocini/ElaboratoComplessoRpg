@@ -1,6 +1,6 @@
 # Il Progettino (Elaborato Complesso RPG)
 
-IT - Inventario, movimento e descrizione arma.
+IT - Inventario, movimento e descrizione arma.<br>
 ENG - Inventory, movements and weapon description.
 ![Alt Text](part1.gif)
 
