@@ -1,22 +1,29 @@
 # Il Progettino (Elaborato Complesso RPG)
 
-inventario, movimento, descrizione arma
+IT - Inventario, movimento e descrizione arma.
+ENG - Inventory, movements and weapon description.
 ![Alt Text](part1.gif)
 
-uccisione nemico, drop denaro, respawn nemico, rigenerazione vita/stamina.
+IT - Uccisione nemico, drop denaro, respawn nemico e rigenerazione vita/stamina.
+ENG - Killing Enemies, drop of coins, enemy respawn and stamina/health regeneration.
 ![Alt Text](part3.gif)
 
-acquisto arma, armi diverse con statistiche diverse
+IT - Acquisto arma, armi diverse hanno statistiche diverse.
+ENG - Purchase of weapons, different weapons have different stats.
 ![Alt Text](negozio.gif)
 
-la morte del player.
+IT - La morte del player.
+ENG - Player gets murdered.
 ![Alt Text](parte4.gif)
 
-possibilità di utilizzare una console di comandi
+IT - Possibilità di utilizzare una console di comandi.
+ENG - Possibility to use a command console.
 ![Alt Text](part5.gif)
 
-la presenza di achievements.
+IT - La presenza di achievements.
+ENG - The presence of in-game achievements.
 ![Alt Text](part6.gif)
 
-possibilità di fare level up con reset delle risorse
+IT - Level up con reset delle risorse (stamina/vita).
+ENG - Level up with resource reset (stamina/health).
 ![Alt Text](part7.gif)
